@@ -1,0 +1,47 @@
+.prologue {
+  position: relative;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  background: radial-gradient(ellipse at 50% 40%, #17120e, var(--ink-900) 70%);
+  cursor: pointer;
+  overflow: hidden auto;
+}
+
+.prologue__scroll {
+  position: relative;
+  z-index: 3;
+  width: min(680px, 90vw);
+  text-align: center;
+}
+
+.prologue__beats {
+  min-height: 42vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--sp-4);
+  margin: var(--sp-5) 0;
+}
+
+.prologue__beat {
+  font-family: var(--font-type);
+  font-size: 1.16rem;
+  line-height: 1.7;
+  color: var(--parch-200);
+  margin: 0;
+  animation: fade-rise 900ms var(--ease-slow) both;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+}
+
+.prologue__hint {
+  font-family: var(--font-type);
+  font-size: 0.8rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-500);
+}
+
+.prologue__go {
+  animation: fade-rise 700ms var(--ease-slow) both;
+}

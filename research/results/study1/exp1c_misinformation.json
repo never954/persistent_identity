@@ -1,0 +1,221 @@
+{
+  "status": "demonstration (kappa is an assumption; human figures are secondary-source)",
+  "kappa_default": 2.0,
+  "accuracy": {
+    "30min_early": {
+      "B1_accurate": {
+        "control": 1.0,
+        "consistent": 1.0,
+        "misleading": 1.0,
+        "misinformation_effect": 0.0
+      },
+      "B2_exp_decay": {
+        "control": 0.6997014235622403,
+        "consistent": 0.6997635252300158,
+        "misleading": 0.6997014235622403,
+        "misinformation_effect": 0.0
+      },
+      "ours_no_source": {
+        "control": 0.7627415155219455,
+        "consistent": 0.8941122732829181,
+        "misleading": 0.7627415155219455,
+        "misinformation_effect": 0.0
+      },
+      "ours": {
+        "control": 0.7627415155219455,
+        "consistent": 0.8941122732829181,
+        "misleading": 0.5659864308120783,
+        "misinformation_effect": 0.19675508470986713
+      }
+    },
+    "30min_late": {
+      "B1_accurate": {
+        "control": 1.0,
+        "consistent": 1.0,
+        "misleading": 1.0,
+        "misinformation_effect": 0.0
+      },
+      "B2_exp_decay": {
+        "control": 0.6997014235622403,
+        "consistent": 0.6997635252300158,
+        "misleading": 0.6997014235622403,
+        "misinformation_effect": 0.0
+      },
+      "ours_no_source": {
+        "control": 0.7627415155219455,
+        "consistent": 0.8941122732829181,
+        "misleading": 0.7627415155219455,
+        "misinformation_effect": 0.0
+      },
+      "ours": {
+        "control": 0.7627415155219455,
+        "consistent": 0.8941122732829181,
+        "misleading": 0.5572488438034666,
+        "misinformation_effect": 0.20549267171847885
+      }
+    },
+    "1week_early": {
+      "B1_accurate": {
+        "control": 1.0,
+        "consistent": 1.0,
+        "misleading": 1.0,
+        "misinformation_effect": 0.0
+      },
+      "B2_exp_decay": {
+        "control": 0.662147128959842,
+        "consistent": 0.6800032078198863,
+        "misleading": 0.662147128959842,
+        "misinformation_effect": 0.0
+      },
+      "ours_no_source": {
+        "control": 0.623285212410737,
+        "consistent": 0.6849278186161054,
+        "misleading": 0.623285212410737,
+        "misinformation_effect": 0.0
+      },
+      "ours": {
+        "control": 0.623285212410737,
+        "consistent": 0.6849278186161054,
+        "misleading": 0.5071115852442158,
+        "misinformation_effect": 0.11617362716652113
+      }
+    },
+    "1week_late": {
+      "B1_accurate": {
+        "control": 1.0,
+        "consistent": 1.0,
+        "misleading": 1.0,
+        "misinformation_effect": 0.0
+      },
+      "B2_exp_decay": {
+        "control": 0.662147128959842,
+        "consistent": 0.6800032078198863,
+        "misleading": 0.662147128959842,
+        "misinformation_effect": 0.0
+      },
+      "ours_no_source": {
+        "control": 0.623285212410737,
+        "consistent": 0.6849278186161054,
+        "misleading": 0.623285212410737,
+        "misinformation_effect": 0.0
+      },
+      "ours": {
+        "control": 0.623285212410737,
+        "consistent": 0.6849278186161054,
+        "misleading": 0.40680147101115777,
+        "misinformation_effect": 0.2164837413995792
+      }
+    }
+  },
+  "kappa_sweep_ours": {
+    "1.0": {
+      "30min_early": {
+        "control": 0.7627415155219455,
+        "consistent": 0.8941122732829181,
+        "misleading": 0.6302671231338702,
+        "misinformation_effect": 0.13247439238807523
+      },
+      "30min_late": {
+        "control": 0.7627415155219455,
+        "consistent": 0.8941122732829181,
+        "misleading": 0.6311968618592532,
+        "misinformation_effect": 0.1315446536626923
+      },
+      "1week_early": {
+        "control": 0.623285212410737,
+        "consistent": 0.6849278186161054,
+        "misleading": 0.5288725789771509,
+        "misinformation_effect": 0.09441263343358608
+      },
+      "1week_late": {
+        "control": 0.623285212410737,
+        "consistent": 0.6849278186161054,
+        "misleading": 0.48470470465898213,
+        "misinformation_effect": 0.13858050775175484
+      }
+    },
+    "1.5": {
+      "30min_early": {
+        "control": 0.7627415155219455,
+        "consistent": 0.8941122732829181,
+        "misleading": 0.5932268447928396,
+        "misinformation_effect": 0.16951467072910587
+      },
+      "30min_late": {
+        "control": 0.7627415155219455,
+        "consistent": 0.8941122732829181,
+        "misleading": 0.5901948493866727,
+        "misinformation_effect": 0.1725466661352728
+      },
+      "1week_early": {
+        "control": 0.623285212410737,
+        "consistent": 0.6849278186161054,
+        "misleading": 0.5143320764820001,
+        "misinformation_effect": 0.1089531359287369
+      },
+      "1week_late": {
+        "control": 0.623285212410737,
+        "consistent": 0.6849278186161054,
+        "misleading": 0.44150964086061584,
+        "misinformation_effect": 0.18177557155012114
+      }
+    },
+    "2.0": {
+      "30min_early": {
+        "control": 0.7627415155219455,
+        "consistent": 0.8941122732829181,
+        "misleading": 0.5659864308120783,
+        "misinformation_effect": 0.19675508470986713
+      },
+      "30min_late": {
+        "control": 0.7627415155219455,
+        "consistent": 0.8941122732829181,
+        "misleading": 0.5572488438034666,
+        "misinformation_effect": 0.20549267171847885
+      },
+      "1week_early": {
+        "control": 0.623285212410737,
+        "consistent": 0.6849278186161054,
+        "misleading": 0.5071115852442158,
+        "misinformation_effect": 0.11617362716652113
+      },
+      "1week_late": {
+        "control": 0.623285212410737,
+        "consistent": 0.6849278186161054,
+        "misleading": 0.40680147101115777,
+        "misinformation_effect": 0.2164837413995792
+      }
+    },
+    "3.0": {
+      "30min_early": {
+        "control": 0.7627415155219455,
+        "consistent": 0.8941122732829181,
+        "misleading": 0.5312200510887467,
+        "misinformation_effect": 0.23152146443319876
+      },
+      "30min_late": {
+        "control": 0.7627415155219455,
+        "consistent": 0.8941122732829181,
+        "misleading": 0.5095045221670831,
+        "misinformation_effect": 0.2532369933548624
+      },
+      "1week_early": {
+        "control": 0.623285212410737,
+        "consistent": 0.6849278186161054,
+        "misleading": 0.5017455516909144,
+        "misinformation_effect": 0.12153966071982258
+      },
+      "1week_late": {
+        "control": 0.623285212410737,
+        "consistent": 0.6849278186161054,
+        "misleading": 0.3565034759926819,
+        "misinformation_effect": 0.2667817364180551
+      }
+    }
+  },
+  "human_secondary": {
+    "consistent": 0.75,
+    "misleading": 0.41,
+    "pattern": "Misleading information is most damaging when it arrives late in a long retention interval (original memory weak, misinformation fresh)."
+  }
+}

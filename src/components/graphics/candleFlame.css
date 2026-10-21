@@ -1,0 +1,72 @@
+.candle {
+  position: relative;
+  display: inline-block;
+  width: calc(26px * var(--candle-scale, 1));
+  height: calc(64px * var(--candle-scale, 1));
+  vertical-align: bottom;
+}
+
+.candle__stick {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 42%;
+  height: 62%;
+  background: linear-gradient(180deg, #efe4cf 0%, #c9b287 100%);
+  border-radius: 3px 3px 2px 2px;
+  box-shadow: inset -3px 0 6px rgba(0, 0, 0, 0.35),
+    inset 3px 0 5px rgba(255, 255, 255, 0.15);
+}
+
+.candle__flame {
+  position: absolute;
+  top: 4%;
+  left: 50%;
+  width: 34%;
+  height: 34%;
+  transform: translateX(-50%);
+  background: radial-gradient(
+    ellipse at 50% 70%,
+    #fff7e0 0%,
+    #f7c65a 40%,
+    #e6802f 72%,
+    rgba(230, 128, 47, 0) 100%
+  );
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  transform-origin: 50% 90%;
+  animation: flame-flicker 1.6s ease-in-out infinite;
+  filter: blur(0.3px);
+}
+
+.candle__halo {
+  position: absolute;
+  top: -8%;
+  left: 50%;
+  width: 160%;
+  height: 60%;
+  transform: translateX(-50%);
+  background: radial-gradient(
+    circle,
+    var(--candle-glow) 0%,
+    rgba(0, 0, 0, 0) 70%
+  );
+  animation: halo-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes flame-flicker {
+  0%, 100% { transform: translateX(-50%) scaleY(1) rotate(-1deg); }
+  25% { transform: translateX(-52%) scaleY(1.08) rotate(1.5deg); }
+  50% { transform: translateX(-49%) scaleY(0.94) rotate(-1.5deg); }
+  75% { transform: translateX(-51%) scaleY(1.05) rotate(1deg); }
+}
+
+@keyframes halo-pulse {
+  0%, 100% { opacity: 0.8; }
+  50% { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .candle__flame,
+  .candle__halo { animation: none; }
+}

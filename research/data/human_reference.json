@@ -1,0 +1,62 @@
+{
+  "_note": "Human reference data used as calibration targets or predictions. 'verified' = read in the primary source during this project; 'secondary' = only from secondary summaries — verify before publishing.",
+
+  "ebbinghaus_savings": {
+    "status": "verified",
+    "source": "Murre & Dros (2015), Replication and Analysis of Ebbinghaus' Forgetting Curve, PLoS ONE 10(7): e0120644, Table 3 (Ebbinghaus column, from his 1880 manuscript p. 56). Plotted intervals per the paper: 19 min, 63 min, 8.75 h, 1 d, 2 d, 6 d, 31 d.",
+    "measure": "savings (proportion of original learning time saved on relearning) — a retention proxy, not recall probability",
+    "hours": [0.3167, 1.05, 8.75, 24, 48, 144, 744],
+    "values": [0.582, 0.442, 0.358, 0.337, 0.278, 0.254, 0.211]
+  },
+
+  "dros_savings": {
+    "status": "verified",
+    "source": "Murre & Dros (2015), Table 3, replication (single subject, Dros).",
+    "measure": "savings",
+    "hours": [0.3333, 1, 9, 24, 48, 144, 744],
+    "values": [0.472, 0.373, 0.276, 0.317, 0.230, 0.168, 0.041]
+  },
+
+  "drm_rm1995_exp2_recognition": {
+    "status": "verified",
+    "source": "Roediger & McDermott (1995), Creating false memories, JEP:LMC 21(4), 803-814, Experiment 2, Table 2 (proportion 'old'). We use the study + arithmetic condition (no prior recall), which matches our memory-level test.",
+    "studied_hit": 0.65,
+    "critical_lure_studied_list": 0.72,
+    "nonstudied_list_item": 0.11,
+    "critical_lure_nonstudied_list": 0.16,
+    "remember_know": {"studied": [0.41, 0.24], "critical_lure": [0.38, 0.34]}
+  },
+
+  "drm_rm1995_exp2_recall": {
+    "status": "verified",
+    "source": "Roediger & McDermott (1995), Experiment 2, Figure 3 caption and Results.",
+    "studied_recall": 0.62,
+    "critical_lure_recall": 0.55
+  },
+
+  "drm_rm1995_exp1_recognition": {
+    "status": "verified",
+    "source": "Roediger & McDermott (1995), Experiment 1, Table 1 (ratings 3 or 4 = old; after free recall).",
+    "studied_hit": 0.86,
+    "unrelated_lure": 0.02,
+    "weakly_related_lure": 0.21,
+    "critical_lure": 0.84
+  },
+
+  "loftus_palmer_1974_broken_glass": {
+    "status": "verified",
+    "source": "Loftus & Palmer (1974), J. Verbal Learning and Verbal Behavior 13, 585-589, Experiment 2 — 'Did you see any broken glass?' (there was none).",
+    "smashed_yes": 0.32,
+    "hit_yes": 0.14,
+    "control_yes": 0.12,
+    "n_per_group": 50
+  },
+
+  "loftus_miller_burns_1978": {
+    "status": "secondary",
+    "source": "Loftus, Miller & Burns (1978), Semantic integration of verbal information into a visual memory, JEP: Human Learning and Memory 4, 19-31. Figures below are from secondary summaries; the qualitative timing pattern is the target.",
+    "correct_consistent": 0.75,
+    "correct_misleading": 0.41,
+    "timing_pattern": "Misleading information is most damaging when it arrives late in a long retention interval (original memory weak, misinformation fresh)."
+  }
+}

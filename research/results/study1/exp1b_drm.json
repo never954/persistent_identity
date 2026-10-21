@@ -1,0 +1,196 @@
+{
+  "analysis": "primary (pre-registered)",
+  "calibration_achieved": {
+    "remember_studied": 0.4099999999999999,
+    "hits": 0.6236024077749516,
+    "unrelated_fa": 0.1298708185957223,
+    "targets": {
+      "remember_studied": 0.41,
+      "hits": 0.65,
+      "unrelated_fa": 0.11
+    },
+    "max_attainable_know_at_target_unrelated_fa": 0.20007200403912487,
+    "target_know": 0.24000000000000005,
+    "jointly_feasible": false
+  },
+  "protocol": "Ours calibrated on remember(studied)=.41, hits=.65, unrelated FA=.11; critical-lure rates are predictions. Baselines calibrated to hits=.65 where they have a free level.",
+  "calibrated_params": {
+    "ours": {
+      "a_word": 0.7505903992346837,
+      "criterion": 4.106165217079643,
+      "noise": 0.2841673620114079
+    },
+    "B2_exp_decay": {
+      "a": 0.6503422969544685
+    },
+    "ours_no_familiarity": {
+      "a": 1.1899603890305965
+    }
+  },
+  "human": {
+    "studied": 0.65,
+    "lure_studied": 0.72,
+    "unstudied_item": 0.11,
+    "lure_unstudied": 0.16
+  },
+  "rates": {
+    "B1_accurate": {
+      "studied": {
+        "mean": 1.0,
+        "ci95": [
+          1.0,
+          1.0
+        ]
+      },
+      "lure_studied": {
+        "mean": 0.0,
+        "ci95": [
+          0.0,
+          0.0
+        ]
+      },
+      "unstudied_item": {
+        "mean": 0.0,
+        "ci95": [
+          0.0,
+          0.0
+        ]
+      },
+      "lure_unstudied": {
+        "mean": 0.0,
+        "ci95": [
+          0.0,
+          0.0
+        ]
+      }
+    },
+    "B2_exp_decay": {
+      "studied": {
+        "mean": 0.65,
+        "ci95": [
+          0.6499548662407774,
+          0.6500444622466189
+        ]
+      },
+      "lure_studied": {
+        "mean": 0.0,
+        "ci95": [
+          0.0,
+          0.0
+        ]
+      },
+      "unstudied_item": {
+        "mean": 0.0,
+        "ci95": [
+          0.0,
+          0.0
+        ]
+      },
+      "lure_unstudied": {
+        "mean": 0.0,
+        "ci95": [
+          0.0,
+          0.0
+        ]
+      }
+    },
+    "ours_no_familiarity": {
+      "studied": {
+        "mean": 0.65,
+        "ci95": [
+          0.6370133395830254,
+          0.6630049096424749
+        ]
+      },
+      "lure_studied": {
+        "mean": 0.0,
+        "ci95": [
+          0.0,
+          0.0
+        ]
+      },
+      "unstudied_item": {
+        "mean": 0.0,
+        "ci95": [
+          0.0,
+          0.0
+        ]
+      },
+      "lure_unstudied": {
+        "mean": 0.0,
+        "ci95": [
+          0.0,
+          0.0
+        ]
+      }
+    },
+    "ours": {
+      "studied": {
+        "mean": 0.6236024077749516,
+        "ci95": [
+          0.58165705580614,
+          0.66688405267594
+        ]
+      },
+      "lure_studied": {
+        "mean": 0.584783792341664,
+        "ci95": [
+          0.4251050410498045,
+          0.7410009836801698
+        ]
+      },
+      "unstudied_item": {
+        "mean": 0.1298708185957223,
+        "ci95": [
+          0.0797065377616142,
+          0.1853586228671754
+        ]
+      },
+      "lure_unstudied": {
+        "mean": 0.12373601713878435,
+        "ci95": [
+          0.031477732054189744,
+          0.23647066975845812
+        ]
+      },
+      "remember_know_lure_studied": {
+        "remember": 0.0,
+        "know": 0.584783792341664
+      }
+    }
+  },
+  "per_list_lure_fa_ours": {
+    "anger": 0.5558516725202087,
+    "black": 0.9999999999998499,
+    "bread": 0.5739789260134154,
+    "chair": 0.8793858733552133,
+    "cold": 0.9999999973200042,
+    "doctor": 0.9994741812120687,
+    "foot": 0.9910952936362667,
+    "fruit": 0.999999859925677,
+    "girl": 0.9445025231756513,
+    "high": 0.7357457674329055,
+    "king": 0.9986435278591614,
+    "man": 3.9896974612929625e-12,
+    "mountain": 0.4246797514228177,
+    "music": 0.9999779924070438,
+    "needle": 0.0021394424434669213,
+    "river": 0.046824236539451114,
+    "rough": 0.7995460372614496,
+    "sleep": 0.05869165881164229,
+    "slow": 0.7688364370027077,
+    "soft": 0.5682766261706621,
+    "spider": 0.6697993714948252,
+    "sweet": 2.4202861936828413e-14,
+    "thief": 0.009423062634096424,
+    "window": 0.00793877755733674
+  },
+  "diagnostics": {
+    "mean_cos_lure_to_its_list": 0.471104484051466,
+    "mean_cos_between_list_items": 0.35754211619496346,
+    "spearman_lure_list_similarity_vs_lure_fa": {
+      "rho": 0.6878260869565217,
+      "p": 0.00020366940684417927
+    }
+  }
+}

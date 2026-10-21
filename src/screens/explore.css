@@ -1,0 +1,126 @@
+.explore {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  background: radial-gradient(120% 90% at 50% 0%, #15110f 0%, #0a0808 70%);
+  color: #e8ddc9;
+}
+
+.explore__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.6rem 1rem;
+  border-bottom: 1px solid rgba(200, 160, 110, 0.14);
+  background: rgba(0, 0, 0, 0.35);
+  z-index: 3;
+}
+.explore__title { text-align: center; display: flex; flex-direction: column; gap: 2px; }
+.explore__progress { font-size: 0.72rem; color: #c8a06e; letter-spacing: 0.04em; }
+.explore__bar-right { min-width: 120px; display: flex; justify-content: flex-end; }
+
+.explore__stage {
+  position: relative;
+  flex: 1;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  padding: 0.5rem;
+}
+
+.explore__canvas {
+  image-rendering: pixelated;
+  width: min(100%, calc((100vh - 150px) * 1.777));
+  max-width: 1152px;
+  aspect-ratio: 16 / 9;
+  border: 1px solid rgba(0, 0, 0, 0.6);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+}
+
+.explore__prompt {
+  position: absolute;
+  bottom: 1.2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0.4rem 0.9rem;
+  background: rgba(10, 8, 8, 0.82);
+  border: 1px solid rgba(200, 160, 110, 0.3);
+  border-radius: 6px;
+  font-size: 0.85rem;
+  letter-spacing: 0.02em;
+  animation: promptPulse 1.6s ease-in-out infinite;
+}
+@keyframes promptPulse { 0%,100% { opacity: 0.82; } 50% { opacity: 1; } }
+
+.explore__who {
+  position: absolute;
+  top: 0.8rem;
+  right: 1rem;
+  font-size: 0.72rem;
+  color: #d7b98c;
+  background: rgba(10, 8, 8, 0.6);
+  padding: 0.25rem 0.6rem;
+  border-radius: 4px;
+}
+
+.explore__finding {
+  position: fixed;
+  inset: 0;
+  background: rgba(4, 3, 3, 0.72);
+  display: grid;
+  place-items: center;
+  z-index: 10;
+  animation: fadeIn 0.2s ease;
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.finding-card {
+  width: min(440px, 90vw);
+  background: linear-gradient(160deg, #211913, #140e0b);
+  border: 1px solid rgba(200, 160, 110, 0.28);
+  border-radius: 10px;
+  padding: 1.4rem 1.5rem;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+  animation: cardRise 0.24s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+@keyframes cardRise { from { transform: translateY(12px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+.finding-card__tag {
+  display: inline-block;
+  font-size: 0.64rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: #9aa0a6;
+  border: 1px solid rgba(154, 160, 166, 0.4);
+  border-radius: 3px;
+  padding: 0.15rem 0.45rem;
+  margin-bottom: 0.7rem;
+}
+.finding-card__tag.is-clue { color: #e7b86a; border-color: rgba(231, 184, 106, 0.5); }
+.finding-card__title { margin: 0 0 0.5rem; font-size: 1.15rem; color: #f0e6d2; }
+.finding-card__text { margin: 0 0 0.8rem; line-height: 1.5; color: #ccc0ab; font-size: 0.92rem; }
+.finding-card__note { margin: 0 0 1rem; font-size: 0.74rem; color: #c8a06e; font-style: italic; }
+
+.explore__hint {
+  display: flex;
+  gap: 1.2rem;
+  justify-content: center;
+  padding: 0.5rem;
+  font-size: 0.72rem;
+  color: #8c8276;
+  border-top: 1px solid rgba(200, 160, 110, 0.1);
+  background: rgba(0, 0, 0, 0.3);
+}
+.explore__hint kbd, .explore__bar kbd, .finding-card kbd {
+  display: inline-block;
+  min-width: 1.1em;
+  text-align: center;
+  padding: 0.05rem 0.35rem;
+  margin: 0 0.15rem;
+  font-size: 0.72em;
+  border: 1px solid rgba(200, 160, 110, 0.4);
+  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.4);
+}

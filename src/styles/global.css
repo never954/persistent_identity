@@ -1,0 +1,164 @@
+/*
+ * Global base styles + shared atmospheric primitives.
+ * Component-specific CSS lives beside each component; this file holds
+ * the reset, the body ground, and reusable "mood" classes.
+ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow: hidden; /* the game manages its own scroll regions */
+}
+
+#root {
+  position: relative;
+  isolation: isolate;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  margin: 0 0 var(--sp-4);
+  color: var(--parch-100);
+}
+
+p {
+  margin: 0 0 var(--sp-4);
+}
+
+button {
+  font-family: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+::selection {
+  background: var(--candle-300);
+  color: var(--ink-900);
+}
+
+/* Thin, in-world scrollbars */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--ink-600);
+  border-radius: 6px;
+  border: 2px solid var(--ink-900);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--ink-500);
+}
+
+/* ---- Reusable atmosphere primitives -------------------------------- */
+
+/* Full-bleed layer used to stack canvas/graphics behind content */
+.layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* A candlelit panel: raised parchment-dark surface with warm rim light */
+.panel {
+  background: linear-gradient(180deg, var(--ink-700), var(--ink-800));
+  border: 1px solid var(--ink-600);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-panel);
+}
+
+/* Small-caps ornamental label */
+.eyebrow {
+  font-family: var(--font-display);
+  font-size: var(--fs-small);
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--candle-300);
+}
+
+/* Primary in-world button: pressed brass plate */
+.btn {
+  font-family: var(--font-display);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  padding: var(--sp-3) var(--sp-5);
+  background: linear-gradient(180deg, var(--ink-600), var(--ink-700));
+  color: var(--parch-100);
+  border: 1px solid var(--ink-500);
+  border-radius: var(--radius);
+  transition: transform var(--dur-fast) var(--ease-slow),
+    box-shadow var(--dur-fast) var(--ease-slow), border-color var(--dur-fast);
+}
+.btn:hover {
+  border-color: var(--candle-300);
+  box-shadow: 0 0 24px var(--candle-glow);
+  transform: translateY(-1px);
+}
+.btn:active {
+  transform: translateY(1px);
+}
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+.btn--accent {
+  background: linear-gradient(180deg, var(--candle-400), var(--candle-300));
+  color: var(--ink-900);
+  border-color: var(--candle-500);
+}
+.btn--danger {
+  background: linear-gradient(180deg, var(--blood-500), var(--blood-600));
+  color: var(--parch-100);
+  border-color: var(--blood-500);
+}
+
+/* Screen-entry fade used by every top-level screen */
+@keyframes fade-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.screen-enter {
+  animation: fade-rise var(--dur-slow) var(--ease-slow) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

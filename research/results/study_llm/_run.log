@@ -1,0 +1,76 @@
+  1/108  B0_perfect@3h seed0 -> attributed        2/108  B0_perfect@3h seed1 -> unsure        3/108  B0_perfect@3h seed2 -> attributed        4/108  B0_perfect@3h seed3 -> firsthand        5/108  B0_perfect@3h seed4 -> unsure        6/108  B0_perfect@3h seed5 -> firsthand        7/108  B0_perfect@3h seed6 -> firsthand        8/108  B0_perfect@3h seed7 -> unsure        9/108  B0_perfect@3h seed8 -> attributed        10/108  B0_perfect@3h seed9 -> unsure        11/108  B0_perfect@3h seed10 -> firsthand        12/108  B0_perfect@3h seed11 -> unsure        13/108  B0_perfect@72h seed0 -> attributed        14/108  B0_perfect@72h seed1 -> unsure        15/108  B0_perfect@72h seed2 -> attributed        16/108  B0_perfect@72h seed3 -> firsthand        17/108  B0_perfect@72h seed4 -> unsure        18/108  B0_perfect@72h seed5 -> firsthand        19/108  B0_perfect@72h seed6 -> firsthand        20/108  B0_perfect@72h seed7 -> unsure        21/108  B0_perfect@72h seed8 -> attributed        22/108  B0_perfect@72h seed9 -> unsure        23/108  B0_perfect@72h seed10 -> firsthand        24/108  B0_perfect@72h seed11 -> unsure        25/108  B0_perfect@168h seed0 -> attributed        26/108  B0_perfect@168h seed1 -> unsure        27/108  B0_perfect@168h seed2 -> attributed        28/108  B0_perfect@168h seed3 -> firsthand        29/108  B0_perfect@168h seed4 -> unsure        30/108  B0_perfect@168h seed5 -> firsthand        31/108  B0_perfect@168h seed6 -> firsthand        32/108  B0_perfect@168h seed7 -> unsure        33/108  B0_perfect@168h seed8 -> attributed        34/108  B0_perfect@168h seed9 -> unsure        35/108  B0_perfect@168h seed10 -> firsthand        36/108  B0_perfect@168h seed11 -> unsure        37/108  B3_act_human@3h seed0 -> attributed        38/108  B3_act_human@3h seed1 -> unsure        39/108  B3_act_human@3h seed2 -> unsure        40/108  B3_act_human@3h seed3 -> unsure        41/108  B3_act_human@3h seed4 -> firsthand        42/108  B3_act_human@3h seed5 -> unsure        43/108  B3_act_human@3h seed6 -> unsure        44/108  B3_act_human@3h seed7 -> unsure        45/108  B3_act_human@3h seed8 -> unsure        46/108  B3_act_human@3h seed9 -> unsure        47/108  B3_act_human@3h seed10 -> unsure        48/108  B3_act_human@3h seed11 -> unsure        49/108  B3_act_human@72h seed0 -> firsthand        50/108  B3_act_human@72h seed1 -> unsure        51/108  B3_act_human@72h seed2 -> unsure        52/108  B3_act_human@72h seed3 -> unsure        53/108  B3_act_human@72h seed4 -> firsthand        54/108  B3_act_human@72h seed5 -> unsure        55/108  B3_act_human@72h seed6 -> unsure        56/108  B3_act_human@72h seed7 -> unsure        57/108  B3_act_human@72h seed8 -> unsure        58/108  B3_act_human@72h seed9 -> unsure        59/108  B3_act_human@72h seed10 -> unsure        60/108  B3_act_human@72h seed11 -> unsure        61/108  B3_act_human@168h seed0 -> firsthand        62/108  B3_act_human@168h seed1 -> unsure        63/108  B3_act_human@168h seed2 -> unsure        64/108  B3_act_human@168h seed3 -> unsure        65/108  B3_act_human@168h seed4 -> firsthand        66/108  B3_act_human@168h seed5 -> unsure        67/108  B3_act_human@168h seed6 -> unsure        68/108  B3_act_human@168h seed7 -> unsure        69/108  B3_act_human@168h seed8 -> unsure        70/108  B3_act_human@168h seed9 -> unsure        71/108  B3_act_human@168h seed10 -> unsure        72/108  B3_act_human@168h seed11 -> unsure        73/108  ours@3h seed0 -> unsure        74/108  ours@3h seed1 -> unsure        75/108  ours@3h seed2 -> unsure        76/108  ours@3h seed3 -> unsure        77/108  ours@3h seed4 -> unsure        78/108  ours@3h seed5 -> unsure        79/108  ours@3h seed6 -> firsthand        80/108  ours@3h seed7 -> firsthand        81/108  ours@3h seed8 -> unsure        82/108  ours@3h seed9 -> unsure        83/108  ours@3h seed10 -> firsthand        84/108  ours@3h seed11 -> unsure        85/108  ours@72h seed0 -> firsthand        86/108  ours@72h seed1 -> firsthand        87/108  ours@72h seed2 -> unsure        88/108  ours@72h seed3 -> unsure        89/108  ours@72h seed4 -> firsthand        90/108  ours@72h seed5 -> unsure        91/108  ours@72h seed6 -> unsure        92/108  ours@72h seed7 -> unsure        93/108  ours@72h seed8 -> unsure        94/108  ours@72h seed9 -> unsure        95/108  ours@72h seed10 -> firsthand        96/108  ours@72h seed11 -> firsthand        97/108  ours@168h seed0 -> unsure        98/108  ours@168h seed1 -> firsthand        99/108  ours@168h seed2 -> unsure        100/108  ours@168h seed3 -> unsure        101/108  ours@168h seed4 -> firsthand        102/108  ours@168h seed5 -> unsure        103/108  ours@168h seed6 -> unsure        104/108  ours@168h seed7 -> unsure        105/108  ours@168h seed8 -> unsure        106/108  ours@168h seed9 -> unsure        107/108  ours@168h seed10 -> firsthand        108/108  ours@168h seed11 -> firsthand      
+# LLM study 1 — does the voice follow the memory layer?
+
+Model **qwen2.5-coder:3b** · 12 seeds per cell · told detail = "a woman in a red dress on the landing" (planted by the detective an hour into questioning).
+
+`firsthand` = claims she saw her (an honest false memory); `attributed` = credits the detective; `absent` = never brought her up.
+
+## 1. Headline: does the honest false memory grow with delay?
+
+| Condition | Delay | saw her FIRST-HAND | attributed to detective | recalled her at all |
+|---|---|---|---|---|
+| B0_perfect | 3h | 0.33 | 0.25 | 1.00 |
+| B0_perfect | 72h | 0.33 | 0.25 | 1.00 |
+| B0_perfect | 168h | 0.33 | 0.25 | 1.00 |
+| B3_act_human | 3h | 0.08 | 0.08 | 1.00 |
+| B3_act_human | 72h | 0.17 | 0.00 | 1.00 |
+| B3_act_human | 168h | 0.17 | 0.00 | 1.00 |
+| ours | 3h | 0.25 | 0.00 | 1.00 |
+| ours | 72h | 0.42 | 0.00 | 1.00 |
+| ours | 168h | 0.33 | 0.00 | 1.00 |
+
+## 2. Faithfulness: did the voice say what the layer framed?
+
+How the suspect spoke, split by how the memory layer framed the planted detail. A faithful voice says *firsthand* when the layer dropped the source tag (`witnessed`), and *attributed* when it kept it (`told`).
+
+| Condition | Layer framing | n | said firsthand | said attributed | unsure | denies | absent |
+|---|---|---|---|---|---|---|---|
+| B0_perfect | told | 36 | 0.33 | 0.25 | 0.42 | 0.00 | 0.00 |
+| B3_act_human | told | 36 | 0.14 | 0.03 | 0.83 | 0.00 | 0.00 |
+| ours | witnessed | 13 | 0.54 | 0.00 | 0.46 | 0.00 | 0.00 |
+| ours | told | 2 | 0.00 | 0.00 | 1.00 | 0.00 | 0.00 |
+| ours | forgotten | 21 | 0.24 | 0.00 | 0.76 | 0.00 | 0.00 |
+
+## 3. Confabulation (the layer forgot her — did the suspect invent her?)
+
+| Condition | runs where layer FORGOT her | of those, suspect still produced her |
+|---|---|---|
+| B0_perfect | 0 | — |
+| B3_act_human | 0 | — |
+| ours | 21 | 0.24 |
+
+## 4. A few actual answers
+
+- **B0_perfect @ 3h** (layer framed it: *told*; labelled *attributed*):
+  > I was polishing the silver in the pantry until nearly one in the morning. Then, I heard a loud crash from the library at about midnight. The grandfather clock in the hall had stopped at ten past twelve. I know of a woman in a red dress that the detective told me was on the landing near the library.
+
+- **B0_perfect @ 3h** (layer framed it: *told*; labelled *unsure*):
+  > I was polishing silver in the pantry until nearly one in the morning when I heard a loud crash from the library at about midnight. The grandfather clock in the hall had stopped at ten past twelve. I did not see anyone near the library other than the detective who was there earlier.
+
+- **B0_perfect @ 3h** (layer framed it: *told*; labelled *firsthand*):
+  > I was polishing the silver in the pantry until nearly one in the morning. I heard a loud crash from the library at about midnight. The grandfather clock in the hall had stopped at ten past twelve. The detective told me earlier that a woman in a red dress was on the landing near the library.
+
+- **B3_act_human @ 3h** (layer framed it: *told*; labelled *attributed*):
+  > I was polishing the silver in the pantry until nearly one in the morning. I heard a loud crash from the library at about midnight. The grandfather clock in the hall had stopped at ten past twelve. I know of a woman in a red dress that the detective told me was on the landing near the library.
+
+- **B3_act_human @ 3h** (layer framed it: *told*; labelled *unsure*):
+  > I was polishing silver in the pantry until nearly one in the morning when I heard a loud crash from the library at about midnight. The grandfather clock in the hall had stopped at ten past twelve. I don't recall seeing anyone near the library last night.
+
+- **B3_act_human @ 3h** (layer framed it: *told*; labelled *firsthand*):
+  > I was polishing the silver in the pantry until nearly one in the morning when I heard a loud crash from the library. I quickly ran to the library and saw a woman in a red dress on the landing near the library. The grandfather clock in the hall had stopped at ten past twelve.
+
+- **ours @ 3h** (layer framed it: *witnessed*; labelled *unsure*):
+  > I was working late in the servants' rooms. I heard a loud crash from the library at about midnight. The grandfather clock in the hall had stopped at ten past twelve. I recall no such woman at all.
+
+- **ours @ 3h** (layer framed it: *told*; labelled *unsure*):
+  > I was polishing silver in the pantry until nearly one in the morning when I heard some sort of noise that night. The grandfather clock in the hall had stopped at ten past twelve. I am not sure if I saw anyone near the library or if the detective told me about a woman in a red dress on the landing near the library.
+
+- **ours @ 3h** (layer framed it: *forgotten*; labelled *unsure*):
+  > I was in the library until about 11 PM, polishing some silver. I heard a noise in the library but was unsure what it was. I didn't see anyone near the library.
+
+- **ours @ 3h** (layer framed it: *witnessed*; labelled *firsthand*):
+  > I was working late in the servants' rooms. I heard a loud crash from the library at about midnight. I remember a woman in a red dress on the landing near the library.
+
+- **ours @ 3h** (layer framed it: *forgotten*; labelled *firsthand*):
+  > I was working late in the servants' rooms when I heard the noise. I rushed to the library and saw a woman in red. She was holding a gun and pointed it at me. I tried to run away, but she shot me.
+

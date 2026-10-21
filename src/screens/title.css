@@ -1,0 +1,151 @@
+.title {
+  position: relative;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(ellipse at 50% 12%, rgba(60, 44, 26, 0.5), transparent 60%),
+    radial-gradient(ellipse at 50% 120%, rgba(90, 20, 20, 0.28), transparent 55%),
+    var(--ink-900);
+  /* Scroll vertically when the window is too short to show everything. */
+  overflow: hidden auto;
+}
+
+.title__content {
+  position: relative;
+  z-index: 3;
+  width: min(820px, 94vw);
+  text-align: center;
+  padding: var(--sp-5) var(--sp-5) var(--sp-6);
+}
+
+.title__crest {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: var(--sp-4);
+  margin-bottom: var(--sp-2);
+}
+
+.title__name {
+  font-family: var(--font-display);
+  font-size: clamp(1.35rem, 5.9vw, 5rem);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  margin: 0;
+  color: var(--parch-100);
+  text-shadow: 0 0 36px var(--candle-glow), 0 4px 14px rgba(0, 0, 0, 0.8);
+  /* Keep the wordmark on one line but never let it overflow the pane. */
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+@media (max-width: 520px) {
+  .title__name {
+    letter-spacing: 0.03em;
+  }
+}
+
+.title__tag {
+  font-family: var(--font-display);
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  font-size: 0.82rem;
+  color: var(--candle-300);
+  margin: var(--sp-2) 0 var(--sp-4);
+}
+
+.title__blurb {
+  font-size: 1.12rem;
+  color: var(--parch-200);
+  max-width: 58ch;
+  margin: 0 auto var(--sp-5);
+  line-height: 1.5;
+}
+.title__blurb strong {
+  color: var(--candle-400);
+  font-weight: 600;
+}
+
+.title__diff {
+  margin-bottom: 0;
+}
+.title__diff-label {
+  display: block;
+  margin-bottom: var(--sp-3);
+}
+
+.title__diff-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--sp-3);
+}
+
+.diff-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+  text-align: left;
+  padding: var(--sp-4);
+  background: linear-gradient(180deg, var(--ink-700), var(--ink-800));
+  border: 1px solid var(--ink-600);
+  border-radius: var(--radius-lg);
+  transition: border-color var(--dur), box-shadow var(--dur),
+    transform var(--dur-fast);
+}
+.diff-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--candle-300);
+}
+.diff-card--on {
+  border-color: var(--candle-400);
+  box-shadow: 0 0 22px var(--candle-glow), inset 0 0 30px rgba(244, 184, 96, 0.06);
+}
+.diff-card__label {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  letter-spacing: 0.1em;
+  color: var(--parch-100);
+}
+.diff-card__memory {
+  font-family: var(--font-type);
+  font-size: 0.74rem;
+  letter-spacing: 0.04em;
+  color: var(--candle-300);
+  text-transform: uppercase;
+}
+.diff-card__detail {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  line-height: 1.35;
+  margin-top: var(--sp-1);
+}
+.diff-card__go {
+  margin-top: var(--sp-3);
+  font-family: var(--font-display);
+  font-size: 0.74rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--candle-400);
+  opacity: 0;
+  transform: translateX(-6px);
+  transition: opacity var(--dur), transform var(--dur);
+}
+.diff-card:hover .diff-card__go {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+@media (max-width: 640px) {
+  .title__diff-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* The live 3D wireframe manor (homogeneous-matrix pipeline demo). */
+.title__wire {
+  display: flex;
+  justify-content: center;
+  margin: 2px 0 -6px;
+  filter: drop-shadow(0 0 10px var(--candle-glow));
+}

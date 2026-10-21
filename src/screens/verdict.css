@@ -1,0 +1,177 @@
+.verdict {
+  position: relative;
+  height: 100%;
+  overflow-y: auto;
+  background: radial-gradient(ellipse at 50% 0%, #16130f, var(--ink-900) 65%);
+}
+
+.verdict__inner {
+  position: relative;
+  z-index: 3;
+  width: min(920px, 94vw);
+  margin: 0 auto;
+  padding: var(--sp-7) var(--sp-5) var(--sp-8);
+  text-align: center;
+}
+
+.verdict__head {
+  font-size: var(--fs-hero);
+  margin: var(--sp-2) 0 var(--sp-4);
+  letter-spacing: 0.08em;
+}
+.verdict__head.is-right {
+  color: var(--sage-300);
+  text-shadow: 0 0 34px rgba(125, 138, 106, 0.4);
+}
+.verdict__head.is-wrong {
+  color: var(--blood-500);
+  text-shadow: 0 0 34px rgba(163, 49, 43, 0.45);
+}
+
+.verdict__lede {
+  font-size: 1.25rem;
+  color: var(--parch-100);
+  max-width: 58ch;
+  margin: 0 auto var(--sp-6);
+}
+.verdict__lede b {
+  color: var(--candle-400);
+}
+
+.verdict__truth {
+  text-align: left;
+  padding: var(--sp-5);
+  margin-bottom: var(--sp-7);
+}
+.verdict__truth p {
+  margin: var(--sp-2) 0 0;
+  font-size: 1.1rem;
+  color: var(--parch-200);
+  line-height: 1.6;
+}
+
+/* ---- Reckoning ------------------------------------------------- */
+.verdict__reckon {
+  margin-bottom: var(--sp-7);
+}
+.verdict__reckon-title {
+  font-size: var(--fs-title);
+  color: var(--candle-400);
+  margin-bottom: var(--sp-2);
+}
+.verdict__reckon-sub {
+  max-width: 62ch;
+  margin: 0 auto var(--sp-5);
+  color: var(--parch-200);
+}
+.verdict__cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--sp-4);
+  text-align: left;
+}
+.reveal-card {
+  padding: var(--sp-4);
+  background: linear-gradient(180deg, var(--ink-700), var(--ink-800));
+  border: 1px solid var(--ink-600);
+  border-top: 3px solid var(--accent);
+  border-radius: var(--radius-lg);
+}
+.reveal-card--killer {
+  border-color: var(--blood-600);
+  border-top-color: var(--blood-500);
+  box-shadow: 0 0 26px rgba(163, 49, 43, 0.25);
+}
+.reveal-card__tag {
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.reveal-card__name {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  color: var(--parch-100);
+  margin: 2px 0 var(--sp-2);
+}
+.reveal-card__truth {
+  margin: 0;
+  font-size: 0.98rem;
+  color: var(--parch-200);
+  line-height: 1.5;
+}
+
+/* ---- Score ----------------------------------------------------- */
+.verdict__score {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: var(--sp-5);
+  align-items: center;
+  padding: var(--sp-5);
+  margin-bottom: var(--sp-6);
+  text-align: left;
+}
+.verdict__rank {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  border-right: 1px solid var(--ink-600);
+  padding-right: var(--sp-4);
+}
+.verdict__rank-name {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  color: var(--candle-400);
+  line-height: 1.1;
+}
+.verdict__rank-num {
+  font-family: var(--font-type);
+  color: var(--text-muted);
+}
+.verdict__breakdown {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+.verdict__breakdown li {
+  display: flex;
+  justify-content: space-between;
+  font-size: 1rem;
+  color: var(--parch-200);
+  padding-bottom: var(--sp-2);
+  border-bottom: 1px dashed var(--ink-600);
+}
+.verdict__breakdown b {
+  color: var(--parch-100);
+  font-family: var(--font-type);
+}
+.verdict__breakdown-mult {
+  border-bottom: none !important;
+  font-weight: 600;
+}
+.verdict__breakdown-mult b {
+  color: var(--candle-400);
+  font-size: 1.2rem;
+}
+
+.verdict__actions {
+  display: flex;
+  justify-content: center;
+  gap: var(--sp-4);
+}
+
+@media (max-width: 640px) {
+  .verdict__score {
+    grid-template-columns: 1fr;
+  }
+  .verdict__rank {
+    border-right: none;
+    border-bottom: 1px solid var(--ink-600);
+    padding: 0 0 var(--sp-3);
+  }
+}

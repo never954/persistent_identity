@@ -1,0 +1,150 @@
+/*
+ * cutscene.css — styles for the cinematic intro cutscene.
+ * ------------------------------------------------------------------
+ * The cutscene renders pixel art to a <canvas> at 384×216 internal
+ * resolution, then displays it full-viewport with nearest-neighbour
+ * upscaling. The subtitle bar and skip prompt are CSS-styled HTML
+ * overlaid on top.
+ */
+
+.cutscene {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: #000;
+  overflow: hidden;
+  cursor: pointer;
+  user-select: none;
+}
+
+/* ---- The pixel canvas -------------------------------------------- */
+
+.cutscene__canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  /* The critical property: upscale without smoothing. */
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  object-fit: contain;
+  transition: opacity 0.5s ease;
+}
+
+.cutscene__canvas.is-fading {
+  opacity: 0;
+}
+
+/* ---- Subtitle bar at the bottom ---------------------------------- */
+
+.cutscene__subtitle-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  padding: var(--sp-5) var(--sp-6) var(--sp-6);
+  background: linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.88) 0%,
+    rgba(0, 0, 0, 0.6) 60%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
+
+.cutscene__subtitle {
+  font-family: var(--font-type);
+  font-size: clamp(1rem, 2.4vw, 1.5rem);
+  line-height: 1.6;
+  color: var(--parch-200);
+  text-align: center;
+  max-width: 680px;
+  margin: 0 auto;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9);
+  opacity: 0;
+  transform: translateY(8px);
+  animation: subtitle-in 0.8s var(--ease-slow) forwards;
+}
+
+@keyframes subtitle-in {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ---- Skip / controls -------------------------------------------- */
+
+.cutscene__controls {
+  position: absolute;
+  top: var(--sp-4);
+  right: var(--sp-4);
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  pointer-events: auto;
+}
+
+.cutscene__skip {
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--parch-300);
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid var(--ink-600);
+  border-radius: var(--radius);
+  padding: var(--sp-2) var(--sp-4);
+  cursor: pointer;
+  transition: color var(--dur-fast), border-color var(--dur-fast);
+}
+
+.cutscene__skip:hover {
+  color: var(--parch-100);
+  border-color: var(--candle-300);
+}
+
+/* ---- Scene progress dots ---------------------------------------- */
+
+.cutscene__dots {
+  position: absolute;
+  bottom: var(--sp-3);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 15;
+  display: flex;
+  gap: 6px;
+  pointer-events: none;
+}
+
+.cutscene__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ink-600);
+  transition: background var(--dur);
+}
+
+.cutscene__dot.is-active {
+  background: var(--candle-400);
+  box-shadow: 0 0 8px var(--candle-glow);
+}
+
+.cutscene__dot.is-past {
+  background: var(--ink-500);
+}
+
+/* ---- Reduced motion --------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .cutscene__subtitle {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+  .cutscene__canvas {
+    transition: none;
+  }
+}
