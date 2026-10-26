@@ -76,3 +76,13 @@
   font-size: 1rem;
   padding: var(--sp-4) var(--sp-6);
 }
+
+.accuse__fate {
+  display: block;
+  text-align: center;
+  margin-top: 4px;
+  font-family: var(--font-type);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--blood-500);
+}

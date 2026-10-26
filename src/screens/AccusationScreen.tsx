@@ -16,6 +16,7 @@ import './accusation.css';
 export function AccusationScreen() {
   const { state, dispatch } = useGame();
   const [selected, setSelected] = useState<string | null>(state.accusedId);
+  const deadline = state.world?.deadline ?? false;
 
   const confirm = () => {
     if (!selected) return;
@@ -36,8 +37,9 @@ export function AccusationScreen() {
         <span className="eyebrow">The Drawing Room · Final Accusation</span>
         <h1 className="accuse__title">Name the Murderer</h1>
         <p className="accuse__sub">
-          Choose the one you believe killed Lord Ravenswood — and pin the evidence
-          that makes your case. Be certain. You accuse only once.
+          {deadline
+            ? 'The Chief Constable is in the drawing room, and he will not wait. Name the murderer — now.'
+            : 'Choose the one you believe killed Lord Ravenswood — and pin the evidence that makes your case. Be certain. You accuse only once.'}
         </p>
 
         <div className="accuse__suspects">
@@ -50,6 +52,8 @@ export function AccusationScreen() {
                 actionLabel="Accuse"
                 onClick={() => setSelected(s.id)}
               />
+              {state.world?.npcs[s.id]?.status === 'dead' && <span className="accuse__fate">dead</span>}
+              {state.world?.npcs[s.id]?.status === 'fled' && <span className="accuse__fate">fled</span>}
             </div>
           ))}
         </div>
@@ -80,12 +84,14 @@ export function AccusationScreen() {
         </div>
 
         <div className="accuse__actions">
-          <button
-            className="btn"
-            onClick={() => dispatch({ type: 'SET_PHASE', phase: 'investigation' })}
-          >
-            ← Keep investigating
-          </button>
+          {!deadline && (
+            <button
+              className="btn"
+              onClick={() => dispatch({ type: 'SET_PHASE', phase: 'investigation' })}
+            >
+              ← Keep investigating
+            </button>
+          )}
           <button
             className="btn btn--danger accuse__confirm"
             disabled={!selected}

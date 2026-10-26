@@ -1,15 +1,12 @@
 /*
- * serviceProvider — the one place the app chooses which SuspectService
- * implementation is live. Swapping the scripted mock for the real
- * memory-backed service is a one-line change here.
+ * serviceProvider — the one place the app chooses which SuspectService is live.
+ *
+ * The suspects are answered by the Python backend (backend/, `npm run server`):
+ * persistent memory per suspect, fallible recall, an LLM voice. There is no
+ * offline imitation: if the server is down, the game says so and how to start it.
  */
 
 import type { SuspectService } from '../types';
-import { memorySuspectService } from './memorySuspectService';
+import { backendSuspectService } from './backendSuspectService';
 
-// The live service. memorySuspectService runs the fallible-memory layer and a
-// local LLM (Ollama) for the suspect's voice; when Ollama is not running it
-// falls back to each belief's authored line, so the game always plays.
-// The scripted keyword service is still available for a pure-offline build:
-//   import { scriptedSuspectService } from './scriptedSuspectService';
-export const suspectService: SuspectService = memorySuspectService;
+export const suspectService: SuspectService = backendSuspectService;

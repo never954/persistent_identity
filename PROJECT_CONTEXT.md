@@ -21,6 +21,8 @@ disagrees with this file, fix one of them — this file is meant to stay true.
 | `docs/VIVA_GUIDE.md` | Technical explainer for the viva: memory design, every graphics algorithm (how + why), syllabus coverage map, likely questions |
 | `docs/DECK_PROMPT.md` | Paste-ready prompt that makes Claude Design build the FA presentation |
 | `docs/shots/*.png` | Real renders from the game's own rasterizer (+ two annotated versions) used in the deck |
+| **`docs/PERSISTENT_MEMORY.md`** | The persistent, fallible suspect backend: every feature, every failure fixed, results, and how to demo it |
+| `backend/` | The suspect server (FastAPI + SQLite memory stream, reusing `research/lcmem`); `demo.py`, `eval_fidelity.py`, tests |
 | `research/` | Memory model (`lcmem/`), experiments, human reference data, results — see `research/README.md` |
 | `paper/ravenswood.tex` | The research paper, IEEE conference format (preliminary draft); compile on Overleaf — see `paper/README.md` |
 | **`docs/RESULTS_EXPLAINED.md`** | Every result so far in plain language: question, method, numbers, meaning, weak points, viva answers — updated as new results arrive |
@@ -48,8 +50,11 @@ only the voice.*
 **Status (20 Oct 2026):** the game is fully playable end-to-end with scripted suspects; the graphics
 engine is complete; the FA deck prompt, viva guide and screenshots are done.
 **Status (21 Oct 2026):** the memory model runs and **Study 1 at the memory level is done** (§6.9) —
-real numbers, compared with published human data. **Next:** the end-to-end LLM runs (B0/B3 baselines,
-Studies 1–3 with the LLM voice), then the game service (FastAPI) and the player pilot.
+real numbers, compared with published human data.
+**Status (23 Oct 2026):** the suspect backend runs and the game uses it — a persistent memory stream
+per suspect, the research model deciding recall, leading-question planting, write-back, Memory
+Inspector; 30 backend tests; voice↔decision agreement 29/30 on 5 saves (`docs/PERSISTENT_MEMORY.md`).
+**Next:** a chat-tuned voice model (`qwen2.5:3b`) and its evaluation, Studies 2–3, the player pilot.
 
 ---
 
@@ -69,7 +74,7 @@ Status: ✅ done · 🔜 agreed, not built yet · ⏸ deferred · ❌ dropped
 | A7 | **Difficulty = the memory-fallibility dial** (Rookie / Detective / Inspector); today it gates "tells", later it sets memory strengths | Ties gameplay difficulty to the research variable | ✅ / 🔜 |
 | A8 | Detective Rating scoring (§4) | Rubric asks for scoring | ✅ |
 | A9 | Title screen: clicking a difficulty card starts the game; layout fits a laptop without scrolling | Users got stuck on a two-step start | ✅ |
-| A10 | Investigation hub = a lit "dollhouse" manor with pixel suspects standing in rooms, pan/zoom camera | Feels like a game, keeps the camera-transform demo | ✅ |
+| A10 | Investigation hub = a walkable top-down manor (rooms, corridors, a bedroom each, the Great Hall); suspects walk tile by tile; camera follows the detective; you only see who is in your room (26 Oct 2026, replacing the pan/zoom "dollhouse" map) | Persistence must be visible: you can watch someone walk past, or not see them at all | ✅ |
 | A11 | Interrogation scene: wide film-noir shot — detective silhouette (with cigarette + smoke), suspect across the desk, banker's lamp, rainy window, portraits, sconce, bookshelf, papers, steaming cup, dust | "The whole room should feel alive" | ✅ |
 
 ### B. Graphics engine (CGG front)
@@ -104,7 +109,7 @@ Status: ✅ done · 🔜 agreed, not built yet · ⏸ deferred · ❌ dropped
 |---|---|---|---|
 | D1 | **Novelty claim** = objective inversion + calibration + game evaluation (§6.3) — *not* a new algorithm, *not* "first human-like memory" | Every individual mechanism is already published (§6.2) | ✅ (decision) |
 | D2 | Target **game / HCI venues** + arXiv first; the same preliminary draft doubles as the FA "additional marks" paper | These venues accept mechanic + system + player-study papers | 🔜 |
-| D3 | Backend: Python **FastAPI** + **ChromaDB** for the game service. Embeddings: `all-MiniLM-L6-v2` (384-d), served locally by **Ollama** (`all-minilm`) instead of the sentence-transformers package; experiments use an in-memory numpy store | Simple, free, CPU-friendly, standard; Ollama was already installed, so no PyTorch download on an 8 GB machine; the same model either way | ◐ embeddings + store done; FastAPI/ChromaDB 🔜 |
+| D3 | Backend: Python **FastAPI** game service (`backend/`) with a **SQLite memory stream** (timestamped rows + stored embeddings, exact cosine search) — revised from ChromaDB because each row carries mutable recall state (last access, rehearsals, source tag) and retrieval uses a custom Smallville score. Embeddings: `all-MiniLM-L6-v2` (384-d) via **Ollama** (`all-minilm`) | Simple, free, CPU-friendly; one transparent file per installation; ChromaDB can sit behind `MemoryStore` later | ✅ 23 Oct 2026 — see `docs/PERSISTENT_MEMORY.md` |
 | D4 | **Local models via Ollama** for all runs on this machine: **`qwen2.5-coder:3b` primary** (clean JSON every field, stays first-person and grounded), **`gemma3:1b` for the cross-model check** (different family). A hosted Claude model stays the quality option if an `ANTHROPIC_API_KEY` is added | Results shouldn't be one model's quirk; the 3b/1b models were already on the machine, so no 4.7 GB download on 8 GB RAM; a 7B thrashes | ◐ 3b wired + first LLM study run; gemma cross-check 🔜 |
 | D5 | **Memories are structured slots** (who / what / where / when / details + strengths + source + salience + core) | Makes blending, labelling and every metric exact | 🔜 |
 | D6 | **Four mechanisms in v1:** power-law decay (detail before gist), interference (slot blending + lures), source-monitoring failure (incl. leading questions), reconsolidation (retelling drift); **core identity exempt** | The minimum set that creates the lie-vs-mistake ambiguity and maps to classic paradigms | 🔜 |
@@ -112,7 +117,7 @@ Status: ✅ done · 🔜 agreed, not built yet · ⏸ deferred · ❌ dropped
 | D8 | **Lies come from a separate deception policy**, not the memory layer; every claim labelled true / lie / false memory / gist-forgotten / evasion | Turns "lie vs honest mistake" into a measurement | 🔜 |
 | D9 | **Simulated game clock** (night of the murder → interrogation next morning; benchmark delays are simulated) | Decay needs time; real time is impractical | 🔜 |
 | D10 | Evaluation = Study 1 (cognitive fidelity), Study 2 (selective fallibility), Study 3 (AI-detective dose-response + small player pilot), baselines B0–B3 + ablations (§6.6) | Automated studies give numbers fast; the pilot gives the game claim | ◐ Study 1 (memory level) ✅ |
-| D11 | **Memory Inspector** overlay in the game (toggle) showing retrieved memories, strengths, distortions | Demo, viva and paper figure in one | 🔜 |
+| D11 | **Memory Inspector** overlay in the game (toggle) showing retrieved memories, strengths, distortions | Demo, viva and paper figure in one | ✅ in "Read memory" (spoiler toggle) |
 | D12 | RAG + prompting only; **no fine-tuning** in v1 | Feasible, controllable, auditable; fine-tuning is future work | ✅ (decision) |
 | D13 | **Study 1 runs at two levels:** first the memory layer alone (its probabilities, no LLM — deterministic, fast, free), then end-to-end with the LLM voice | Isolates the mechanism from LLM noise; gives numbers before any API spend | ✅ memory level |
 | D14 | **DRM protocol (fixed before any lure result was seen):** calibrate on Roediger & McDermott 1995 Exp 2 *studied-item* data only (remember .41, know .24, unrelated-word FA .11); critical-lure rates are **predictions, never fitted**. Any later change (e.g. mean-centred embeddings) is reported as **post-hoc sensitivity** | Prevents fitting the result we claim to predict | ✅ |
@@ -146,9 +151,11 @@ Removed files were moved to the macOS Trash on 20 Oct 2026, in
 
 ## 3. What runs today vs what's next
 
-**Runs today:** full game loop with scripted suspects (keyword-matched dialogue tagged
-plain / lie / false-memory / evasion), rasterized cutscene and interrogation scene, pixel dollhouse
-map with pan/zoom camera, case book, accusation, verdict and scoring, 3-D wireframe on the title.
+**Runs today:** full game loop with **persistent, fallible LLM suspects** served by `backend/`
+(`npm run server` + `npm run dev`; see `docs/PERSISTENT_MEMORY.md`), rasterized cutscene,
+interrogation scene and eight explorable rooms, pixel dollhouse map with pan/zoom camera, case
+book, accusation, verdict and scoring, 3-D wireframe on the title; saves survive a refresh and a
+server restart.
 **Research, runs today:** the memory model (`research/lcmem/`, 9 unit tests) and all of Study 1 at the
 memory level — `cd research && .venv/bin/python experiments/run_study1.py` regenerates every number
 and figure in §6.9.
@@ -312,8 +319,9 @@ Seed memories are authored per suspect *from their viewpoint*, consistent with `
 policy denies / fabricates / deflects. **Labelling:** each structured claim is compared with its
 cited memory and with ground truth → true · lie · false memory · gist/forgotten · evasion.
 
-**Frontend:** `serviceProvider.ts` → `memorySuspectService` (HTTP); labels hidden from the player;
-Memory Inspector overlay behind a toggle.
+**Frontend:** `serviceProvider.ts` → `backendSuspectService` (HTTP via the Vite `/api` proxy); labels
+hidden from the player; Memory Inspector overlay behind a toggle. *As built (23 Oct 2026): see
+`docs/PERSISTENT_MEMORY.md` — it supersedes the sketch above where they differ.*
 
 ### 6.6 Evaluation and the paper
 - **RQ1 fidelity** — does the layer move a persistent agent from superhuman to human-calibrated
@@ -427,24 +435,30 @@ magnitudes (DRM is low), anything about the LLM's actual answers, or anything ab
 ```
 src/
   game/           store.tsx (FSM) · types.ts (contracts) · scoring.ts
-    case/         caseData.ts (ground truth) · suspects.ts · dialogue.ts (scripted lines)
-    services/     scriptedSuspectService.ts · serviceProvider.ts (the swap point)
+    case/         caseData.ts (ground truth) · suspects.ts · dialogue.ts (greetings + suggested questions)
+                  · roomLayouts.ts (explorable rooms)
+    services/     session.ts · backendSuspectService.ts · serviceProvider.ts (the swap point)
   components/
     pixel/        pixelRenderer.ts · palettes.ts · characters.ts · PixelSprite.tsx
                   transforms3d.ts · Wireframe3D.tsx
     scene/        interrogationScene.ts · InterrogationRoom.tsx
     graphics/     Atmosphere.tsx · CandleFlame.tsx
-    ui/           MansionMap.tsx · NotebookPanel.tsx · Portrait.tsx
-  screens/        Title · Cutscene (+ cutscene/sceneCompositions.ts) · Prologue · InvestigationHub
+    manor/        manorScene.ts (the walkable top-down manor)
+    ui/           NotebookPanel.tsx · Portrait.tsx · Toasts.tsx
+  screens/        Title · Cutscene (+ cutscene/sceneCompositions.ts) · Prologue · Manor
                   · Interrogation · Accusation · Verdict
 docs/             VIVA_GUIDE.md · DECK_PROMPT.md · shots/
+backend/          ravenswood/ (suspect server: store · agent · fallible · characters · server) · tests/
+                  · demo.py · eval_fidelity.py · data/ (saves, gitignored)
 research/         lcmem/ (memory model) · experiments/ (Study 1) · data/ (human reference values)
                   · tests/ · results/study1/ · README.md
 scripts/          renderEntry.ts · runRender.mjs · annotate.py
 ```
 | Command | Does |
 |---|---|
-| `npm run dev` | Dev server (http://localhost:5173) |
+| `npm run play` | Everything at once: suspect backend + game; open http://localhost:5173 |
+| `npm run server` | Suspect backend (http://127.0.0.1:8000; needs Ollama) |
+| `npm run dev` | Dev server (http://localhost:5173; proxies `/api` to the backend) |
 | `npm run build` | Type-check + production build |
 | `npm run render:shots` | Re-render the game scenes headlessly into `docs/shots/` |
 | `npm run annotate:shots` | Rebuild the two annotated screenshots (needs Python + Pillow) |

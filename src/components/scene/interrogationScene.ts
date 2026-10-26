@@ -33,6 +33,16 @@ import {
 export interface RoomOpts {
   suspectId: string;
   speaking: boolean;
+  /** 0..100 — fear makes them tremble, anger flushes them red (backend world.py). */
+  fear?: number;
+  anger?: number;
+  /** The detective's revolver is out and pointed at them. */
+  gun?: boolean;
+  /** They walked out or fled: an empty chair. */
+  absent?: boolean;
+  dead?: boolean;
+  /** Muzzle flash this frame. */
+  flash?: boolean;
 }
 
 /** Convert a bust's hex palette to the RGB-tuple palette blitSprite wants. */
@@ -148,14 +158,36 @@ export function drawInterrogationRoom(
   const bust = BUSTS[opts.suspectId] ?? BUSTS.vivian;
   const blink = time % 4 < 0.13;
   const mouthOpen = opts.speaking && Math.floor(time * 6) % 2 === 0;
-  const frame = mouthOpen ? bust.talkRows : blink ? bust.blinkRows : bust.rows;
   const s = 3;
   const spriteW = 26 * s;
-  const bob = Math.round(Math.sin(time * 1.4) * 2);
-  const lean = opts.speaking ? Math.round(Math.sin(time * 3) * 2) - 3 : 0;
-  const suspX = Math.round(w / 2 - spriteW / 2) + 30;
-  const suspY = deskTop - 32 * s + 14 + bob + lean;
-  blitScaled(c, frame, colorPalette(opts.suspectId), suspX, suspY, s);
+  const suspX0 = Math.round(w / 2 - spriteW / 2) + 30;
+  if (opts.absent && !opts.dead) {
+    // An empty chair: they walked out (or ran).
+    const cx = suspX0 + 20;
+    c.fillRect(cx, deskTop - 58, 38, 58, WOOD_DARK_RAMP[2][0], WOOD_DARK_RAMP[2][1], WOOD_DARK_RAMP[2][2]);
+    c.strokeRect(cx, deskTop - 58, 38, 58, WOOD_DARK_RAMP[5][0], WOOD_DARK_RAMP[5][1], WOOD_DARK_RAMP[5][2]);
+    c.fillRect(cx + 6, deskTop - 50, 26, 30, WOOD_DARK_RAMP[3][0], WOOD_DARK_RAMP[3][1], WOOD_DARK_RAMP[3][2]);
+  } else {
+    const frame = opts.dead ? bust.blinkRows : mouthOpen ? bust.talkRows : blink ? bust.blinkRows : bust.rows;
+    const fear = opts.fear ?? 0;
+    // Fear shows as a tremble; the worse it is, the more they shake.
+    const tremble = !opts.dead && fear >= 55 ? Math.round(Math.sin(time * 40) * (fear >= 80 ? 2 : 1)) : 0;
+    const bob = opts.dead ? 0 : Math.round(Math.sin(time * 1.4) * 2);
+    const lean = opts.speaking ? Math.round(Math.sin(time * 3) * 2) - 3 : 0;
+    const cower = !opts.dead && (opts.gun || fear >= 80) ? 6 : 0; // shrinking back from the gun
+    const slump = opts.dead ? 34 : 0;
+    const suspX = suspX0 + tremble;
+    const suspY = deskTop - 32 * s + 14 + bob + lean + cower + slump;
+    blitScaled(c, frame, colorPalette(opts.suspectId), suspX, suspY, s);
+    // Anger flushes the face.
+    const anger = opts.anger ?? 0;
+    if (anger >= 25 && !opts.dead) {
+      c.applyLighting(suspX + spriteW / 2, suspY + 30, 26, 220, 40, 30, Math.min(0.5, anger / 160));
+    }
+    if (opts.dead) {
+      c.applyLighting(suspX + spriteW / 2, deskTop - 4, 40, 120, 10, 10, 0.6);
+    }
+  }
 
   // ---- Desk (foreground table) -------------------------------------
   c.fillGradient(0, deskTop, w, 22, WOOD_LIGHT_RAMP.slice(2, 5));
@@ -195,6 +227,17 @@ export function drawInterrogationRoom(
   // warm rim light on the lamp-facing edge
   c.drawVLine(dcx + 20, deskTop - 6, 40, TRENCHCOAT_RAMP[2][0], TRENCHCOAT_RAMP[2][1], TRENCHCOAT_RAMP[2][2]);
 
+  // ---- The revolver, levelled at the suspect -----------------------
+  if (opts.gun || opts.flash) {
+    const gx = dcx + 20;
+    const gy = deskTop - 14;
+    // Lit by the lamp, so brighter than the silhouette holding it.
+    c.fillRect(gx, gy, 9, 6, 92, 92, 102);           // cylinder
+    c.fillRect(gx + 9, gy + 1, 16, 3, 120, 120, 130); // barrel
+    c.fillRect(gx - 3, gy + 5, 5, 8, WOOD_DARK_RAMP[4][0], WOOD_DARK_RAMP[4][1], WOOD_DARK_RAMP[4][2]); // grip
+    c.drawHLine(gx + 9, gy + 1, 16, 190, 190, 200);  // glint
+  }
+
   // ---- The detective's cigarette (occasional drag + smoke) ---------
   const drag = Math.max(0, Math.sin(time * 0.8)); // slow flare
   const embX = dcx + 20;
@@ -221,6 +264,12 @@ export function drawInterrogationRoom(
 
   // ---- Vignette focuses attention on the interrogation -------------
   c.applyVignette(w / 2 - 40, deskTop - 30, 150, 0.7);
+
+  // ---- Muzzle flash ----------------------------------------------------
+  if (opts.flash) {
+    c.applyLighting(dcx + 46, deskTop - 13, 240, 255, 236, 190, 1.0);
+    c.fillEllipse(dcx + 48, deskTop - 12, 7, 4, 255, 240, 200);
+  }
 }
 
 function drawPortrait(c: PixelCanvas, x: number, y: number, pw: number, ph: number): void {

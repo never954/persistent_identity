@@ -149,3 +149,23 @@
   margin: 2px 0 -6px;
   filter: drop-shadow(0 0 10px var(--candle-glow));
 }
+
+/* Continue a saved investigation / server-not-running notice */
+.title__continue {
+  margin: 0.4rem auto 0.2rem;
+  display: block;
+}
+.title__error {
+  max-width: 36rem;
+  margin: 0.6rem auto 0;
+  padding: 0.6rem 0.9rem;
+  border: 1px solid var(--blood-500);
+  background: rgba(124, 31, 31, 0.18);
+  color: var(--parch-100);
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+.diff-card:disabled {
+  opacity: 0.55;
+  cursor: wait;
+}

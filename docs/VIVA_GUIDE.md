@@ -140,15 +140,26 @@ tunable parameter. Four mechanisms in v1 (see `PROJECT_CONTEXT.md` §6 for the f
   **deliberate lie** look identical. Telling them apart is the detective's real job.
 
 ## 1.7 What is actually built today (be honest)
-Right now the suspects answer from a **scripted dialogue service**
-(`scriptedSuspectService.ts`): it lower-cases your question, scores each authored line by
-**keyword overlap** weighted by an authored priority, and returns the best match — each line
-tagged with a **kind**: `plain`, `lie`, `false-memory`, or `evasion`. The difficulty tier gates
-whether a "tell" hint is shown. Everything routes through one interface, **`SuspectService.ask()`**.
-The planned backend (Python **FastAPI** + **ChromaDB** + local **sentence-transformers** embeddings
-+ a **provider-agnostic LLM adapter**, experiments run on one API model *and* one local model)
-drops in by changing **one line** in `serviceProvider.ts`, with **no change to any screen.** The
-`kind` tags in today's scripted data are exactly the labels the memory layer will produce.
+The suspects are answered by the **suspect backend** (`backend/`, Python FastAPI), which the game
+calls through one interface, **`SuspectService.ask()`** (`backendSuspectService.ts`). For every
+question it:
+- retrieves from that suspect's **persistent memory stream**, a SQLite table of timestamped
+  memories with embeddings, using the Smallville score;
+- lets the **research memory model** (`research/lcmem`) decide what is recalled;
+- decides the statement **kind** (`plain`, `lie`, `false-memory`, `evasion`) itself;
+- has a local LLM voice the answer;
+- writes the exchange back into memory.
+
+Suspects therefore remember the conversation, answer personal questions consistently, and can be
+misled by your leading questions. The difficulty tier gates whether a "tell" hint is shown.
+
+Be accurate about two things:
+- The voice is a 3B model running locally (`qwen2.5-coder:3b`). In an evaluation, its words agreed
+  with the engine's decision in 29 of 30 checks; its residual errors are embellishment and
+  agreeing too readily.
+- Ollama must be running.
+
+Details, results and a demo script: `docs/PERSISTENT_MEMORY.md`.
 
 ## 1.8 Evaluation (how we'll prove it) and the honest novelty claim
 - **Study 1 — cognitive fidelity (automated):** run classic paradigms on our agent and baselines
@@ -582,7 +593,7 @@ any new algorithm here and say whether it is textbook, approximated, or browser-
 `PixelSprite.tsx` (procedural sprites) · `palettes.ts` (colour ramps) · `interrogationScene.ts` +
 `InterrogationRoom.tsx` (interrogation scene) · `screens/cutscene/sceneCompositions.ts` +
 `CutsceneScreen.tsx` (cutscene + bitmap font) · `store.tsx` (FSM) · `caseData.ts` (ground truth) ·
-`scriptedSuspectService.ts` (current dialogue) · `serviceProvider.ts` (the swap point) ·
+`backendSuspectService.ts` + `session.ts` (the game's link to the suspect backend) · `serviceProvider.ts` (the swap point) · `backend/ravenswood/` (the suspects' memory) ·
 `scripts/renderEntry.ts` + `runRender.mjs` (headless PNG renders) · `scripts/annotate.py`
 (annotated screenshots).
 

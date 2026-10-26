@@ -158,3 +158,42 @@
     max-height: 40vh;
   }
 }
+
+/* ---- The day so far: what happened while you were busy ----------- */
+.day-log {
+  position: absolute;
+  top: var(--sp-3);
+  right: var(--sp-3);
+  z-index: 6;
+  width: min(380px, calc(100% - 24px));
+  max-height: calc(100% - 24px);
+  overflow-y: auto;
+  padding: var(--sp-4);
+  background: rgba(14, 11, 10, 0.95);
+  border: 1px solid var(--ink-500);
+  border-radius: var(--radius);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.55);
+}
+.day-log__list {
+  margin: var(--sp-2) 0 var(--sp-3);
+  padding-left: 1.2em;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-family: var(--font-body);
+  color: var(--parch-200);
+}
+.day-log__item.is-police { color: #e0a29c; }
+.day-log__item.is-offscreen { color: var(--sage-300); }
+.day-log__people {
+  list-style: none;
+  margin: 0;
+  padding: var(--sp-2) 0 0;
+  border-top: 1px solid var(--ink-600);
+  font-family: var(--font-type);
+  font-size: 0.95rem;
+  color: var(--parch-300);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}

@@ -321,3 +321,158 @@
   .intg__vn { padding-inline: 10px; }
   .intg__composer { width: 96vw; }
 }
+
+/* ---- Memory Inspector (spoiler tool: why the suspect said that) ---- */
+.intg__memory:has(.inspector) {
+  width: min(460px, 92vw);
+  max-height: calc(100vh - 220px);
+  overflow-y: auto;
+}
+.inspector__toggle {
+  width: 100%;
+  margin-top: var(--sp-3);
+  font-size: 0.78rem;
+}
+.inspector {
+  margin-top: var(--sp-3);
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+.inspector__decision {
+  margin: 0 0 0.5rem;
+  color: var(--candle-500);
+}
+.inspector__planted {
+  margin: 0 0 0.5rem;
+  color: var(--blood-500);
+}
+.inspector__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.4rem;
+}
+.inspector__item {
+  padding: 0.35rem 0.5rem;
+  border-left: 2px solid var(--ink-500);
+  background: rgba(255, 255, 255, 0.03);
+}
+.inspector__item.is-used { border-left-color: var(--candle-400); }
+.inspector__item.is-forgotten { opacity: 0.5; }
+.inspector__tags {
+  display: block;
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--parch-300);
+}
+.inspector__text { color: var(--parch-100); }
+
+/* ---- The living house: mood, tones, deeds ------------------------ */
+.mood {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 4px 10px;
+  margin-top: 4px;
+  font-family: var(--font-type);
+  font-size: 0.82rem;
+}
+.mood__bar {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--parch-300);
+}
+.mood__track {
+  width: 46px;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.mood__fill {
+  display: block;
+  height: 100%;
+  transition: width var(--dur-med, 300ms) ease-out;
+}
+.mood__bar--fear .mood__fill { background: #8fa6c8; }
+.mood__bar--trust .mood__fill { background: var(--sage-300); }
+.mood__bar--anger .mood__fill { background: var(--blood-500); }
+.mood__words {
+  width: 100%;
+  color: var(--candle-300);
+  font-style: italic;
+}
+
+.intg__tones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.tone {
+  font-family: var(--font-type);
+  font-size: 0.9rem;
+  letter-spacing: 0.04em;
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--ink-500);
+  background: rgba(20, 16, 13, 0.85);
+  color: var(--parch-300);
+}
+.tone:hover:not(:disabled) { color: var(--parch-100); border-color: var(--parch-300); }
+.tone.is-on { color: var(--ink-900); background: var(--candle-400); border-color: var(--candle-400); }
+.tone--threaten.is-on, .tone--insult.is-on { background: var(--blood-500); border-color: var(--blood-500); color: var(--parch-100); }
+.tone--comfort.is-on, .tone--beg.is-on { background: var(--sage-300); border-color: var(--sage-300); }
+.tone:disabled { opacity: 0.4; }
+
+.intg__deeds {
+  width: min(760px, 92vw);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  margin-bottom: var(--sp-2);
+}
+.deed {
+  font-family: var(--font-type);
+  font-size: 0.92rem;
+  padding: 5px 12px;
+  border-radius: var(--radius);
+  border: 1px solid var(--ink-500);
+  background: rgba(10, 8, 7, 0.82);
+  color: var(--parch-200);
+  transition: color var(--dur-fast), border-color var(--dur-fast);
+}
+.deed:hover:not(:disabled) { color: var(--candle-400); border-color: var(--candle-300); }
+.deed--danger { color: #e0a29c; border-color: rgba(163, 49, 43, 0.6); }
+.deed--danger:hover:not(:disabled) { color: #ffcfc9; border-color: var(--blood-500); }
+.deed:disabled { opacity: 0.45; }
+
+.intg__offer, .intg__gone {
+  width: min(760px, 92vw);
+  margin-bottom: var(--sp-2);
+  padding: 10px 14px;
+  border-radius: var(--radius);
+  font-family: var(--font-body);
+  text-align: center;
+}
+.intg__offer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  background: rgba(40, 26, 10, 0.88);
+  border: 1px solid var(--candle-300);
+  color: var(--parch-100);
+}
+.intg__offer > span { flex-basis: 100%; font-style: italic; }
+.intg__gone {
+  background: rgba(10, 8, 7, 0.85);
+  border: 1px solid var(--ink-500);
+  color: var(--parch-200);
+  font-style: italic;
+}

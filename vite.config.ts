@@ -7,13 +7,13 @@ export default defineConfig({
   server: {
     port: 5173,
     open: false,
-    // Proxy the suspect LLM to the local Ollama server so the browser has no
-    // CORS to fight. The memory service calls /ollama/api/chat.
+    // The suspects live in the Python backend (backend/, `npm run server`).
+    // Proxying /api keeps the browser on one origin — no CORS.
     proxy: {
-      '/ollama': {
-        target: 'http://localhost:11434',
+      '/api': {
+        // RAVENSWOOD_API points a second copy of the game at another backend (testing).
+        target: process.env.RAVENSWOOD_API ?? 'http://127.0.0.1:8000',
         changeOrigin: true,
-        rewrite: (p) => p.replace(/^\/ollama/, ''),
       },
     },
   },

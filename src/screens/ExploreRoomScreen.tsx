@@ -16,20 +16,39 @@ import { drawRoom, type PlayerState } from '../components/room/roomScene';
 import { ROOM_LAYOUTS, type Hotspot } from '../game/case/roomLayouts';
 import { ROOMS_BY_ID, CLUES_BY_ID } from '../game/case/caseData';
 import { SUSPECTS_BY_ID } from '../game/case/suspects';
+import { advance, noteClue, worldView } from '../game/services/session';
 import type { RoomId } from '../game/types';
 import './explore.css';
 
 const REACH = 26;      // how close (px) you must stand to examine a prop
 const SPEED = 78;      // px / second
+// Searching takes time, and the suspects' memories age while it passes.
+export const MINUTES_TO_ENTER = 8;
+const MINUTES_TO_EXAMINE = 2;
 
 interface Finding { label: string; text: string; isClue: boolean; }
+
+/** What you find instead, when someone in the house tidied the evidence away. */
+const LOST_TEXT: Record<string, string> = {
+  'cold-teapot': 'The tea things have been washed and put away. Whatever the pot could have told you, Agnes has scrubbed it clean.',
+  'gambling-papers': 'A gap behind the wine rack, and fresh scuffs in the dust. Something was hidden here — and someone has taken it.',
+};
 
 export function ExploreRoomScreen() {
   const { state, dispatch } = useGame();
   const roomId = (state.activeRoomId ?? 'study') as RoomId;
   const layout = ROOM_LAYOUTS[roomId];
   const room = ROOMS_BY_ID[roomId];
-  const suspect = layout.suspectId ? SUSPECTS_BY_ID[layout.suspectId] : null;
+  // Who is here NOW: people keep their own day (backend world.py), so the room's
+  // usual occupant may be at lunch, and others may have wandered in.
+  const hereIds = state.world
+    ? Object.entries(state.world.npcs)
+        .filter(([, n]) => n.room === roomId && (n.status === 'present' || n.status === 'refusing'))
+        .map(([id]) => id)
+    : layout.suspectId ? [layout.suspectId] : [];
+  const suspect = hereIds.length ? SUSPECTS_BY_ID[hereIds[0]] : null;
+  const others = hereIds.slice(1).map((id) => SUSPECTS_BY_ID[id]);
+  const lost = state.world?.lost_clues ?? [];
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const player = useRef<PlayerState>({ x: layout.spawnX, facing: 1, moving: false });
@@ -54,13 +73,28 @@ export function ExploreRoomScreen() {
   const examinedRef = useRef(examinedIds);
   examinedRef.current = examinedIds;
 
+  // Walking in is charged by the hub's "Enter" click, not here: an effect would
+  // fire twice under React StrictMode and double-charge the clock.
+  const passTime = (minutes: number) =>
+    advance(minutes, state.player ? [Math.floor(state.player[0]), Math.floor(state.player[1])] : undefined).then((r) => {
+      if (!r) return;
+      dispatch({ type: 'SET_CLOCK', clockLabel: r.clock_label });
+      if (r.world) dispatch({ type: 'SET_WORLD', world: { ...r.world, clock_label: r.clock_label } });
+    });
+
   const examine = () => {
     const id = nearRef.current;
     if (!id) return;
     const hs = layout.hotspots.find((h) => h.id === id);
     if (!hs || hs.decor) return;
-    if (hs.clueId) {
+    passTime(MINUTES_TO_EXAMINE);
+    if (hs.clueId && lost.includes(hs.clueId) && !state.cluesFound.includes(hs.clueId)) {
+      // Someone got to it first (off-screen life).
+      setFinding({ label: hs.label, text: LOST_TEXT[hs.clueId] ?? 'Whatever was here is gone.', isClue: false });
+    } else if (hs.clueId) {
       dispatch({ type: 'DISCOVER_CLUE', clueId: hs.clueId });
+      // The house reacts to what you know (the killer's nerve, above all).
+      noteClue(hs.clueId).then(() => worldView().then((w) => w && dispatch({ type: 'SET_WORLD', world: w })));
       const clue = CLUES_BY_ID[hs.clueId];
       setFinding({ label: clue.title, text: clue.detail, isClue: true });
     } else {
@@ -156,12 +190,14 @@ export function ExploreRoomScreen() {
   return (
     <div className="explore screen-enter">
       <header className="explore__bar">
-        <button className="btn" onClick={leave}>◂ Map</button>
+        <button className="btn" onClick={leave}>◂ Back</button>
         <div className="explore__title">
           <span className="eyebrow">{room.name}</span>
-          {roomClues.length > 0 && (
-            <span className="explore__progress">{foundHere}/{roomClues.length} clues found</span>
-          )}
+          <span className="explore__progress">
+            {roomClues.length > 0 && `${foundHere}/${roomClues.length} clues found`}
+            {roomClues.length > 0 && state.clockLabel && ' · '}
+            {state.clockLabel}
+          </span>
         </div>
         <div className="explore__bar-right">
           {suspect && (
@@ -169,6 +205,11 @@ export function ExploreRoomScreen() {
               Question {suspect.name.split(' ')[0]} <kbd>Q</kbd>
             </button>
           )}
+          {others.map((p) => (
+            <button key={p.id} className="btn" onClick={() => dispatch({ type: 'OPEN_INTERROGATION', suspectId: p.id })}>
+              Question {p.name.split(' ')[0]}
+            </button>
+          ))}
         </div>
       </header>
 
@@ -185,7 +226,7 @@ export function ExploreRoomScreen() {
         {/* Suspect presence hint */}
         {suspect && (
           <div className="explore__who">
-            {suspect.name} is here.
+            {[suspect, ...others].map((p) => p.name).join(', ')} {others.length ? 'are' : 'is'} here.
           </div>
         )}
       </div>
@@ -209,7 +250,7 @@ export function ExploreRoomScreen() {
         <span><kbd>←</kbd><kbd>→</kbd> move</span>
         <span><kbd>E</kbd> examine</span>
         {suspect && <span><kbd>Q</kbd> question</span>}
-        <span><kbd>Esc</kbd> back to map</span>
+        <span><kbd>Esc</kbd> back to the house</span>
       </footer>
     </div>
   );

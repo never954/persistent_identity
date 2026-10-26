@@ -13,20 +13,21 @@
 
 import { useEffect, useRef } from 'react';
 import { PixelCanvas, PX_WIDTH, PX_HEIGHT } from '../pixel/pixelRenderer';
-import { drawInterrogationRoom } from './interrogationScene';
+import { drawInterrogationRoom, type RoomOpts } from './interrogationScene';
 import type { Suspect } from '../../game/types';
 
 export function InterrogationRoom({
   suspect,
   speaking = false,
+  ...mood
 }: {
   suspect: Suspect;
   speaking?: boolean;
-}) {
+} & Omit<RoomOpts, 'suspectId' | 'speaking'>) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   // Live values the animation loop reads without re-subscribing.
-  const optsRef = useRef({ suspectId: suspect.id, speaking });
-  optsRef.current = { suspectId: suspect.id, speaking };
+  const optsRef = useRef<RoomOpts>({ suspectId: suspect.id, speaking, ...mood });
+  optsRef.current = { suspectId: suspect.id, speaking, ...mood };
 
   useEffect(() => {
     const canvas = canvasRef.current;

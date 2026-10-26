@@ -14,3 +14,6 @@ vite.config.d.ts
 research/.venv/
 __pycache__/
 .pytest_cache/
+
+# suspect backend: per-save memory databases and embedding cache
+backend/data/

@@ -6,7 +6,10 @@
  * the point of building fallible memory into the suspects.
  */
 
+import { useEffect, useState } from 'react';
 import { useGame } from '../game/store';
+import { verdict } from '../game/services/session';
+import type { Ending } from '../game/types';
 import { Atmosphere } from '../components/graphics/Atmosphere';
 import { SUSPECTS_BY_ID } from '../game/case/suspects';
 import { CASE_META, SOLUTION } from '../game/case/caseData';
@@ -57,7 +60,14 @@ const REVEALS: Reveal[] = [
 
 export function VerdictScreen() {
   const { state, dispatch } = useGame();
+  // How the case closes depends on the whole day — bribes, flight, a body on the
+  // back stairs, a shot fired — not only on the name you gave (backend world.py).
+  const [ending, setEnding] = useState<Ending | null>(null);
+  useEffect(() => {
+    verdict(state.accusedId, state.attachedEvidence).then(setEnding);
+  }, [state.accusedId, state.attachedEvidence]);
   const correct = state.accusedId === SOLUTION.killerId;
+  const good = ending ? ending.good : correct;
   const accused = state.accusedId ? SUSPECTS_BY_ID[state.accusedId] : null;
   const killer = SUSPECTS_BY_ID[SOLUTION.killerId];
 
@@ -78,22 +88,33 @@ export function VerdictScreen() {
         dust
         intensity={0.9}
         candles={[
-          { x: 0.5, y: 0.1, radius: 0.4, rgb: correct ? '125,138,106' : '163,49,43' },
+          { x: 0.5, y: 0.1, radius: 0.4, rgb: good ? '125,138,106' : '163,49,43' },
         ]}
       />
 
       <div className="verdict__inner">
         <span className="eyebrow">Case Closed · {CASE_META.title}</span>
-        <h1 className={'verdict__head ' + (correct ? 'is-right' : 'is-wrong')}>
-          {correct ? 'Case Solved' : 'The Wrong Suspect'}
+        <h1 className={'verdict__head ' + (good ? 'is-right' : 'is-wrong')}>
+          {ending ? ending.title : correct ? 'Case Solved' : 'The Wrong Suspect'}
         </h1>
 
         <p className="verdict__lede">
-          You accused <b>{accused?.name ?? 'no one'}</b>.{' '}
-          {correct
-            ? 'You saw through the calm and named the killer.'
-            : `The true murderer was ${killer.name}, and they walked free.`}
+          {ending ? (
+            ending.text
+          ) : (
+            <>
+              You accused <b>{accused?.name ?? 'no one'}</b>.{' '}
+              {correct
+                ? 'You saw through the calm and named the killer.'
+                : `The true murderer was ${killer.name}, and they walked free.`}
+            </>
+          )}
         </p>
+        {ending && ending.epilogue.length > 0 && (
+          <ul className="verdict__epilogue">
+            {ending.epilogue.map((line) => <li key={line}>{line}</li>)}
+          </ul>
+        )}
 
         <div className="verdict__truth panel">
           <span className="eyebrow">What really happened</span>

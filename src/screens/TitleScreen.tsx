@@ -1,13 +1,15 @@
 /*
- * TitleScreen — the front door. Sets the mood (heavy atmosphere) and
- * lets the player choose a difficulty. The three difficulties are the
- * public face of the memory-fallibility dial: today they only gate how
- * many "tells" the game shows; once the backend lands, they will set the
- * suspects' actual decay / interference / source-amnesia strengths.
+ * TitleScreen — the front door. Sets the mood (heavy atmosphere) and lets the
+ * player choose a difficulty, which gates how many "tells" the game shows.
+ * Each suspect's memory itself comes from their own profile on the backend.
+ * Starting a game creates a save on the suspect backend (every suspect's
+ * memory stream is seeded there); Continue resumes the save in this browser.
  */
 
-import { useGame } from '../game/store';
+import { useEffect, useState } from 'react';
+import { loadSaved, useGame, type GameState } from '../game/store';
 import type { Difficulty } from '../game/types';
+import { newSession, sessionExists, SERVER_HINT, BackendError } from '../game/services/session';
 import { Atmosphere } from '../components/graphics/Atmosphere';
 import { CandleFlame } from '../components/graphics/CandleFlame';
 import { Wireframe3D } from '../components/pixel/Wireframe3D';
@@ -23,25 +25,51 @@ const DIFFICULTIES: {
   {
     id: 'rookie',
     label: 'Rookie',
-    memory: 'Clear memories',
-    detail: 'Suspects barely misremember, and the game whispers every tell. For learning the ropes.',
+    memory: 'Every tell shown',
+    detail: 'The game whispers every tell — when someone lies, misremembers, or talks around a question. For learning the ropes.',
   },
   {
     id: 'detective',
     label: 'Detective',
-    memory: 'Fraying memories',
-    detail: 'Honest mistakes and real lies both appear. Only the strongest tells are shown.',
+    memory: 'Strong tells only',
+    detail: 'You are told only when a statement is a lie or an honest false memory — not which one.',
   },
   {
     id: 'inspector',
     label: 'Inspector',
-    memory: 'Treacherous memories',
-    detail: 'Heavy forgetting and false memory. No tells at all — trust nothing, verify everything.',
+    memory: 'No tells',
+    detail: 'No tells at all. The suspects forget and misremember exactly as before — trust nothing, verify everything.',
   },
 ];
 
 export function TitleScreen() {
   const { dispatch } = useGame();
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [saved, setSaved] = useState<GameState | null>(null);
+
+  // Offer Continue only if this browser has a game AND the server still has its save.
+  useEffect(() => {
+    const s = loadSaved();
+    if (s?.saveId) sessionExists(s.saveId).then((ok) => setSaved(ok ? s : null));
+  }, []);
+
+  const start = async (difficulty: Difficulty) => {
+    if (busy) return;
+    setBusy(true);
+    setError(null);
+    try {
+      const s = await newSession(difficulty);
+      dispatch({ type: 'START', difficulty, saveId: s.save_id, clockLabel: s.clock_label });
+    } catch (e) {
+      setError(
+        e instanceof BackendError && e.problem === 'offline'
+          ? `The suspects’ memory server is not running. ${SERVER_HINT}`
+          : `Could not open the case: ${(e as Error).message}`,
+      );
+      setBusy(false);
+    }
+  };
 
   return (
     <div className="title screen-enter">
@@ -78,9 +106,21 @@ export function TitleScreen() {
           honest mistake?</strong>
         </p>
 
+        {saved && (
+          <button
+            type="button"
+            className="btn btn--accent title__continue"
+            onClick={() => dispatch({ type: 'RESUME', state: saved })}
+          >
+            Continue the investigation · {saved.clockLabel ?? ''} · {saved.cluesFound.length} clues
+          </button>
+        )}
+
+        {error && <p className="title__error" role="alert">{error}</p>}
+
         <div className="title__diff">
           <span className="eyebrow title__diff-label">
-            Choose a difficulty to begin
+            {busy ? 'Opening the case file…' : saved ? 'Or begin a new case' : 'Choose a difficulty to begin'}
           </span>
           <div className="title__diff-grid">
             {DIFFICULTIES.map((d) => (
@@ -88,7 +128,8 @@ export function TitleScreen() {
                 key={d.id}
                 type="button"
                 className="diff-card"
-                onClick={() => dispatch({ type: 'START', difficulty: d.id })}
+                disabled={busy}
+                onClick={() => start(d.id)}
               >
                 <span className="diff-card__label">{d.label}</span>
                 <span className="diff-card__memory">{d.memory}</span>
