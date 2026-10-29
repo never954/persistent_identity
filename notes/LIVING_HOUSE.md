@@ -115,7 +115,7 @@ other, so the suspect later answers *"what do you think of me?"* with it.
 
 | You say | They… |
 |---|---|
-| *"Show me around"* | walk you through the house, waiting for you at each room and naming it ("The Great Hall. We all take luncheon here at noon.") |
+| *"Show me around"* | walk you through the house, waiting for you at each room, introducing anyone there ("That's Mrs Hartwell, the housekeeper.") and naming the room ("The Great Hall. We all take luncheon here at noon.") |
 | *"Take me to the cellar"*, *"Show me Julian's room"* | lead you there: "Here we are — The Wine Cellar." |
 | *"Follow me"* / *"Come with me"* | follow you for half an hour |
 | *"Go to your room"*, *"Get out"* | go |
@@ -135,6 +135,11 @@ Live run:
   room.
 - Miss Cross, asked to dance: *"I am not in the mood for such frivolities."* At gunpoint she
   protested, then danced, and *"Miss Cross will remember that"*.
+
+When someone agrees to take you somewhere, the interview closes by itself so they can set off; a
+suspect stands still while you are questioning them. An order is carried out even under the
+constable's watch: the constable tags along. The voice is held to the decision: a "yes" spoken as a
+refusal is retried. Found in play: Dr. Vance agreed at gunpoint but kept saying "below my station".
 
 Anything done at gunpoint is stored in their memory ("the detective made me dance at gunpoint")
 and spreads as news.

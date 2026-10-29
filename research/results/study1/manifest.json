@@ -1,9 +1,9 @@
 {
-  "run_utc": "2026-10-20T23:26:28+00:00",
+  "run_utc": "2026-10-29T03:42:21+00:00",
   "python": "3.11.9",
   "numpy": "2.4.6",
   "scipy": "1.17.1",
   "matplotlib": "3.11.2",
   "embedding_model": "ollama:all-minilm (all-MiniLM-L6-v2, 384-d)",
-  "ollama": "0.40.4"
+  "ollama": "0.40.11"
 }

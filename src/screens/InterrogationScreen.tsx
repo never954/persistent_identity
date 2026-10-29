@@ -69,6 +69,10 @@ const TONES: { id: Tone; label: string; hint: string }[] = [
   { id: 'insult', label: 'Insult', hint: 'Push far enough and they walk out.' },
 ];
 
+function shortName(id: string): string {
+  return id === 'vance' ? 'Dr. Vance' : id === 'vivian' ? 'Miss Cross' : SUSPECTS_BY_ID[id].name.split(' ')[0];
+}
+
 /** What a deed looks like in the transcript. */
 const DEED_LINES: Record<Deed, (name: string) => string> = {
   strike: (n) => `[You strike ${n} across the face.]`,
@@ -206,7 +210,7 @@ export function InterrogationScreen() {
       dispatch({
         type: 'ADD_TURN',
         suspectId: suspect.id,
-        turn: { id: uid('deed'), role: 'detective', text: DEED_LINES[deed](suspect.name.split(' ')[0]) },
+        turn: { id: uid('deed'), role: 'detective', text: DEED_LINES[deed](shortName(suspect.id)) },
       });
       if (r.line) {
         dispatch({ type: 'ADD_TURN', suspectId: suspect.id, turn: { id: uid('sus'), role: 'suspect', text: r.line } });
@@ -273,6 +277,19 @@ export function InterrogationScreen() {
 
       // Suspect "speaks" — drives the lean-in + mouth transforms.
       speak(statement.answer);
+
+      // They agreed to take you somewhere: end the interview so they can set off (a suspect
+      // stands still while you are questioning them), and say who to follow.
+      const agreed = /^request: (tour|lead|follow|goto) \(agreed\)$/.exec(trace?.decision.rule ?? '');
+      if (agreed) {
+        const who = shortName(suspect.id);
+        const hint = agreed[1] === 'goto' ? `${who} goes off as told.` : agreed[1] === 'follow'
+          ? `${who} will follow you.` : `${who} leads the way — follow them.`;
+        window.setTimeout(() => {
+          dispatch({ type: 'TOAST', texts: [hint], kind: 'remember' });
+          dispatch({ type: 'CLOSE_INTERROGATION' });
+        }, Math.min(3500, 1200 + statement.answer.length * 22));
+      }
     } catch (err) {
       reportError(err);
     } finally {

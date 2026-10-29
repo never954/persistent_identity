@@ -1,6 +1,6 @@
 # Study 1 — Cognitive fidelity at the memory level (auto-generated)
 
-Run 2026-10-20T23:26:28+00:00 · embeddings ollama:all-minilm (all-MiniLM-L6-v2, 384-d) · numpy 2.4.6 · scipy 1.17.1
+Run 2026-10-29T03:42:21+00:00 · embeddings ollama:all-minilm (all-MiniLM-L6-v2, 384-d) · numpy 2.4.6 · scipy 1.17.1
 
 All numbers below are produced by `experiments/run_study1.py`; nothing is hand-entered.
 

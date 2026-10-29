@@ -156,6 +156,11 @@ REVELATIONS = {
     "ju-alibi-truth": ("Julian admitted to the detective he was down in the cellar last night, not in the library.", False),
 }
 
+# How a guide introduces each of them on a tour.
+INTRO = {"agnes": "Mrs Hartwell, the housekeeper", "julian": "Mr Julian Ravenswood, his lordship's nephew",
+         "vance": "Dr. Eleanor Vance, the family's doctor", "thomas": "Thomas Bell, the valet",
+         "vivian": "Miss Vivian Cross, his lordship's business partner"}
+
 _FIRST = {cid: c.name.split()[0] for cid, c in CHARACTERS.items()}
 _FIRST["vance"] = "Dr. Vance"
 _FIRST["vivian"] = "Miss Cross"
@@ -492,10 +497,9 @@ class World:
         n, s = self.npc(cid), self.s
         own = f"{cid}_room"
         player = tuple(s["player"]) if s.get("player") else None
-        if s["watch"] == cid:
-            return tuple(n["pos"]), "under the constable's eye"
         task = n.get("task")
         if task and t < task["until"]:
+            # (An order from the detective is carried out even under watch: the constable tags along.)
             k = task["kind"]
             if k in ("dance", "sit", "stay"):
                 return tuple(n["pos"]), {"dance": "dancing", "sit": "sitting, as you asked",
@@ -509,6 +513,8 @@ class World:
                 verb = "showing you the way to" if k == "lead" else "going to"
                 return manor.spot(task["area"], cid, "task"), f"{verb} {manor.AREAS[task['area']]['name']}"
         n["task"] = None
+        if s["watch"] == cid:
+            return tuple(n["pos"]), "under the constable's eye"
         if n["status"] == "refusing":
             return manor.spot(own, cid, "sulk"), "keeping to their room"
         if cid == "vivian" and self.flag("fleeing") and not self.flag("fled"):
@@ -614,6 +620,17 @@ class World:
                 stop = task["stops"][task["i"]]
                 if n["area"] != stop or not with_you:
                     continue
+                # Anyone in the room gets introduced first ("That's Mrs Hartwell, the housekeeper.").
+                met = task.setdefault("met", [])
+                here = next((o for o in CHARACTERS if o not in (cid, *met) and self.present(o)
+                             and self.npc(o)["area"] == n["area"]), None)
+                if here and (task.get("intro_t") is None or t >= task["intro_t"] + 1 / 60):
+                    met.append(here)
+                    task["intro_t"] = t
+                    self._say(cid, f"That's {INTRO[here]}.", t)
+                    continue
+                if task.get("intro_t") is not None and t < task["intro_t"] + 1 / 60:
+                    continue   # let the last introduction be heard before describing the room
                 if task.get("said") is None:
                     task["said"] = t
                     self._say(cid, manor.ABOUT.get(stop, manor.AREAS[stop]["name"]), t)
@@ -772,7 +789,6 @@ class World:
             n["fear"], n["anger"] = n["fear"] * 0.9, n["anger"] * 0.85   # tempers cool
             if n["status"] == "refusing" and t >= n["until"]:
                 n["status"] = "present"
-        s["gun"] = None  # nobody holds a revolver on someone for half an hour
         # Every two hours everyone takes stock, even on a quiet day (reflection, in the background).
         if t - s.setdefault("last_reflect_all", t) >= 2.0 - 1e-9:
             s["last_reflect_all"] = t

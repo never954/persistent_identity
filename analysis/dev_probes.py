@@ -1,6 +1,8 @@
-"""How often does the voice say what the memory layer decided? (a small Study-2 check)
+"""DEVELOPMENT probes — used while building and tuning the game. NOT used for any number
+in the paper: those come from the held-out probes in study2_fidelity.py. Kept so the
+difference between development and evaluation sets is visible.
 
-    research/.venv/bin/python backend/eval_fidelity.py [URL] [N_SESSIONS]
+    research/.venv/bin/python analysis/dev_probes.py [URL] [N_SESSIONS]
 
 Runs N fresh saves through fixed probes against a running backend and scores each
 answer with transparent word rules against the ENGINE's decision for that turn:

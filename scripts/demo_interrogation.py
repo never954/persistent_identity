@@ -1,6 +1,6 @@
 """Scripted interrogation against a running backend — an end-to-end demo / smoke test.
 
-    research/.venv/bin/python backend/demo.py [http://127.0.0.1:8000]
+    research/.venv/bin/python scripts/demo_interrogation.py [http://127.0.0.1:8000]
 
 Shows, with the real model and real embeddings, the four things the memory
 system exists for:

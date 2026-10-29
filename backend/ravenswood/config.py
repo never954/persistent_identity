@@ -83,3 +83,14 @@ COVER_MIN = 0.5
 # near-copy 0.87, a legitimate consistent paraphrase 0.80, varied answers ≈ 0.33.
 REPEAT_OVERLAP = 0.85
 REPEAT_NGRAM = 5            # …or the same 5-word run in 2 of the last 4 answers
+
+# ---- Experiment switches (analysis/ sets these; the game leaves them at their defaults) --
+# WORLD_ON=False freezes the house: no moods, gossip, schedules or story events, and no
+#   pressure on suggestibility, so memory experiments are not confounded by them.
+# CHECKS_ON=False speaks the voice's first answer as is (ablation of check-then-retry).
+# POLICY="prompt_only" lets the language model decide: it is shown the retrieved memories
+#   accurately (secrets included) and asked to act like a person with imperfect memory —
+#   the baseline the decide-then-voice architecture is compared against.
+WORLD_ON = os.environ.get("RAVENSWOOD_WORLD", "on") != "off"
+CHECKS_ON = os.environ.get("RAVENSWOOD_CHECKS", "on") != "off"
+POLICY = os.environ.get("RAVENSWOOD_POLICY", "engine")

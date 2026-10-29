@@ -188,3 +188,76 @@ def test_an_open_question_about_someone_plants_nothing(make_engine):
     sid = e.new_session()
     a = e.ask(sid, "thomas", q)
     assert a.trace["planted_now"] == []
+
+
+# ---- Found in play, 27 Oct 2026 (save 14f3b5ac1c95): tours, the revolver, Dr. Vance ----
+def test_a_watched_suspect_still_does_what_the_detective_asks():
+    from ravenswood.world import World, initial
+    w = World(initial(10.0))
+    w.apply_deed("thomas", "watch", 10.0)                       # the constable is on him…
+    w.start_task("thomas", {"kind": "tour"}, 10.0)              # …and he agreed to show you round
+    start = list(w.npc("thomas")["pos"])
+    for _ in range(20):
+        w.s["player"] = list(w.npc("thomas")["pos"])
+        w.tick(w.s["minute"] / 60 + 1 / 60)
+    assert w.npc("thomas")["pos"] != start
+
+
+def test_a_tour_introduces_the_people_you_meet():
+    from ravenswood.world import World, initial
+    w = World(initial(10.0))
+    w.tick(13.1)                                                # everyone at luncheon
+    w.start_task("thomas", {"kind": "tour"}, 13.1)
+    said = []
+    for _ in range(10):
+        w.s["player"] = list(w.npc("thomas")["pos"])
+        w.tick(w.s["minute"] / 60 + 1 / 60)
+        if w.npc("thomas")["say"] and w.npc("thomas")["say"] not in said:
+            said.append(w.npc("thomas")["say"])
+    assert any("Mrs Hartwell, the housekeeper" in x for x in said)
+
+
+def test_the_revolver_stays_drawn_while_you_talk_and_holsters_when_you_walk(make_engine, base_params):
+    from ravenswood.agent import Engine
+    e0 = make_engine()
+    e = Engine(e0.store, e0.emb, ScriptedVoice(["Put that away!"] + ["Very well."] * 12), base_params)
+    sid = e.new_session()
+    e.act(sid, "vance", "draw")
+    for _ in range(10):                                         # 40 minutes of talking at gunpoint
+        e.ask(sid, "vance", "Tell me about your evening.")
+    assert e.world_view(sid)["gun"] == "vance"
+    e.advance(sid, 1, [30, 36])                                 # you walk off
+    assert e.world_view(sid)["gun"] is None
+
+
+def test_at_gunpoint_a_refusal_in_words_is_not_accepted(make_engine, base_params):
+    from ravenswood.agent import Engine
+    e0 = make_engine()
+    e = Engine(e0.store, e0.emb, ScriptedVoice(["Put that away!", "That is below my station.",
+                                                "Very well — this way, Detective."]), base_params)
+    sid = e.new_session()
+    e.act(sid, "vance", "draw")
+    a = e.ask(sid, "vance", "Show me around the house.")
+    assert a.trace["decision"]["rule"] == "request: tour (agreed)"
+    assert a.answer == "Very well — this way, Detective."
+    assert a.trace["checks"][0]["problem"].startswith("it refuses")
+
+
+def test_the_template_is_never_read_aloud(make_engine, base_params):
+    from ravenswood.agent import Engine
+    e0 = make_engine()
+    e = Engine(e0.store, e0.emb, ScriptedVoice(["<What you say aloud>: 'I cannot comply with that, sir.'"]),
+               base_params)
+    sid = e.new_session()
+    a = e.ask(sid, "vance", "Do you like music?")
+    assert a.answer == "I cannot comply with that, sir."
+
+
+def test_deeds_name_the_doctor_properly(make_engine, base_params):
+    from ravenswood.agent import Engine
+    e0 = make_engine()
+    e = Engine(e0.store, e0.emb, ScriptedVoice(["Sir!"]), base_params)
+    sid = e.new_session()
+    e.act(sid, "vance", "strike")
+    log = e.store.recent_turns(sid, "vance", 2)
+    assert log[0].text == "[You strike Dr. Vance across the face.]"

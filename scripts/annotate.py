@@ -2,7 +2,7 @@
 """annotate.py — bake numbered CGG callouts onto game screenshots.
 Adds an editorial legend strip beneath the image and numbered red markers
 on the image, mapping each element to the algorithm that draws it.
-Output: docs/shots/interrogation_algorithms.png and _lighting.png
+Output: notes/shots/interrogation_algorithms.png and _lighting.png
 """
 from PIL import Image, ImageDraw, ImageFont
 
@@ -54,8 +54,8 @@ def annotate(src, out, markers, legend, title):
 
 # ---- Image A: scan-conversion / primitive algorithms ----
 annotate(
-    "docs/shots/interrogation.png",
-    "docs/shots/interrogation_algorithms.png",
+    "notes/shots/interrogation.png",
+    "notes/shots/interrogation_algorithms.png",
     [(158, 214), (384, 372), (655, 300), (640, 520), (1000, 300)],
     [
         ("Bresenham line", "window mullions & rain streaks (drawLine, integer decision)"),
@@ -69,8 +69,8 @@ annotate(
 
 # ---- Image B: lighting, particles & atmosphere ----
 annotate(
-    "docs/shots/interrogation.png",
-    "docs/shots/interrogation_lighting.png",
+    "notes/shots/interrogation.png",
+    "notes/shots/interrogation_lighting.png",
     [(384, 430), (520, 250), (120, 150), (300, 452), (1090, 40)],
     [
         ("Radial additive light", "warm lamp pool, (1 − d/R)² falloff (applyLighting)"),

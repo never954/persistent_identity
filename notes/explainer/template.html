@@ -1,0 +1,352 @@
+<title>Reliably Unreliable, Explained</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,400;7..72,600;7..72,700&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: one reading column (~68ch) with figures set on white plates, a sticky contents strip on wide screens. */
+:root {
+  --bg: #fbfbf9; --fg: #1d2129; --muted: #59606d; --rule: #dfe1e6; --accent: #2f4fb3; --accent-soft: #e9edfa;
+  --plate: #ffffff; --warn: #9a4b00; --warn-soft: #fff3e3; --good: #1d6b47; --good-soft: #e6f4ec;
+  --serif: "Literata", Georgia, "Times New Roman", serif;
+  --sans: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #15171c; --fg: #e7e9ee; --muted: #a3a9b6; --rule: #2d313a; --accent: #8ea6f5; --accent-soft: #1f2640;
+  --plate: #ffffff; --warn: #f0b36b; --warn-soft: #2e2416; --good: #7fd3a6; --good-soft: #15281f; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #15171c; --fg: #e7e9ee; --muted: #a3a9b6; --rule: #2d313a; --accent: #8ea6f5; --accent-soft: #1f2640;
+  --plate: #ffffff; --warn: #f0b36b; --warn-soft: #2e2416; --good: #7fd3a6; --good-soft: #15281f; color-scheme: dark }
+body { background: var(--bg); color: var(--fg); font-family: var(--serif); font-size: 17px; line-height: 1.62; }
+.wrap { max-width: 44rem; margin: 0 auto; padding-block: 2.5rem 5rem;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+h1, h2, h3 { font-family: var(--serif); line-height: 1.2; text-wrap: balance; }
+h1 { font-size: 2.1rem; margin: 0 0 .4rem; font-weight: 700; }
+h2 { font-size: 1.45rem; margin: 3rem 0 .6rem; padding-top: 1.2rem; border-top: 1px solid var(--rule); }
+h3 { font-size: 1.1rem; margin: 1.8rem 0 .4rem; font-family: var(--sans); font-weight: 700; }
+p { margin: .7rem 0; }
+.kicker { font-family: var(--sans); font-size: .78rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.lede { font-size: 1.12rem; color: var(--fg); }
+a { color: var(--accent); }
+nav.toc { font-family: var(--sans); font-size: .9rem; margin: 1.6rem 0 0; padding: .9rem 1rem; border: 1px solid var(--rule); border-radius: 6px; }
+nav.toc ol { margin: .3rem 0 0; padding-left: 1.2rem; columns: 2 14rem; column-gap: 1.5rem; }
+nav.toc li { margin: .15rem 0; break-inside: avoid; }
+figure { margin: 1.4rem 0; }
+.plate { background: var(--plate); border: 1px solid var(--rule); border-radius: 6px; padding: .6rem; }
+.plate img { display: block; width: 100%; height: auto; }
+figcaption { font-family: var(--sans); font-size: .86rem; color: var(--muted); margin-top: .45rem; }
+.read { font-family: var(--sans); font-size: .95rem; background: var(--accent-soft); border-radius: 6px; padding: .75rem 1rem; margin: 1rem 0; }
+.read b { color: var(--accent); }
+.caveat { font-family: var(--sans); font-size: .95rem; background: var(--warn-soft); border-radius: 6px; padding: .75rem 1rem; margin: 1rem 0; }
+.caveat b { color: var(--warn); }
+.ask { font-family: var(--sans); font-size: .95rem; border-left: 3px solid var(--good); background: var(--good-soft); border-radius: 0 6px 6px 0; padding: .6rem 1rem; margin: 1rem 0; }
+.ask b { color: var(--good); }
+.tablebox { overflow-x: auto; margin: 1rem 0; }
+table { border-collapse: collapse; font-family: var(--sans); font-size: .9rem; width: 100%; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; padding: .4rem .6rem; border-bottom: 1px solid var(--rule); vertical-align: top; }
+th { color: var(--muted); font-weight: 700; font-size: .82rem; letter-spacing: .02em; }
+td.num { font-family: var(--mono); font-size: .85rem; white-space: nowrap; }
+dl { margin: .6rem 0; }
+dt { font-family: var(--sans); font-weight: 700; margin-top: .7rem; }
+dd { margin: .1rem 0 0 0; }
+.flow { display: grid; grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr)); gap: .5rem; margin: 1rem 0; font-family: var(--sans); font-size: .85rem; }
+.flow div { border: 1px solid var(--rule); border-radius: 6px; padding: .55rem .65rem; min-width: 0; }
+.flow div b { display: block; font-size: .78rem; color: var(--muted); letter-spacing: .04em; text-transform: uppercase; margin-bottom: .15rem; }
+.flow div.llm { border-color: var(--warn); background: var(--warn-soft); }
+code { font-family: var(--mono); font-size: .85em; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+</style>
+
+<div class="wrap">
+<p class="kicker">A guide to the paper · for presenting it</p>
+<h1>Reliably Unreliable, explained</h1>
+<p class="lede">What the paper argues, what each figure and table shows, what each number means, where the
+weak spots are, and how to answer the questions a teacher or reviewer is likely to ask.</p>
+
+<nav class="toc" aria-label="Contents"><b>Contents</b>
+<ol>
+<li><a href="#minute">The paper in one minute</a></li>
+<li><a href="#story">The story it tells</a></li>
+<li><a href="#terms">Terms you need</a></li>
+<li><a href="#system">The system (Figure 1)</a></li>
+<li><a href="#setup">How the tests were kept fair</a></li>
+<li><a href="#s1">Study 1: memory vs. human data</a></li>
+<li><a href="#s2">Study 2: does the answer follow the decision?</a></li>
+<li><a href="#s3">Study 3: does a suggestion become a memory?</a></li>
+<li><a href="#s4">Study 4: gossip, pressure, habits</a></li>
+<li><a href="#s5">Study 5: identity stays, episodes fade</a></li>
+<li><a href="#limits">Limits, and how to answer them</a></li>
+<li><a href="#questions">Likely questions</a></li>
+<li><a href="#status">Where the paper stands</a></li>
+</ol></nav>
+
+<h2 id="minute">1. The paper in one minute</h2>
+<p><b>Problem.</b> Game characters built on language models can now remember past conversations. But
+the memory systems behind them are built to remember <i>well</i>. A witness in a detective game should
+remember the way people do: forget details, mix up what they saw with what they were told, pick up
+other people's versions, and fill gaps with what usually happens. If you just tell the language model
+to "have imperfect memory", you get errors, but you cannot control who makes them or how often, and you
+cannot tell a lie from an honest mistake.</p>
+<p><b>Idea.</b> Split <i>deciding</i> from <i>speaking</i>. A memory model built from cognitive
+psychology, with numbers fitted to real human data, decides what a character can still recall and
+whether an answer is the truth, a lie, an honest false memory or forgetting. The language model only
+turns that decision into a sentence. Secrets are never shown to the language model.</p>
+<p><b>Findings.</b> The memory model produces the human error types that normal agent memory cannot
+(Study 1). Deciding outside the language model is what keeps secrets: when the model itself knows a
+secret and is told to keep it, it gives it away in about one answer in five (15 of 72); with our design,
+none of 144 answers did (Study 2). With the memory model deciding, two different language models made errors at
+similar rates; when the language model decided, the two models behaved in opposite ways (Study 3).
+Gossip turns into "I saw it myself" at rates set by each character's suggestibility (Study 4), and
+characters keep who they are while details of the night fade (Study 5). One mechanism, interrogative
+pressure, did almost nothing, and the paper says so.</p>
+
+<h2 id="story">2. The story it tells</h2>
+<p>This is the narrative to follow when you present. Every section of the paper serves one step.</p>
+<div class="tablebox"><table>
+<tr><th>Step</th><th>What we say</th><th>Where</th></tr>
+<tr><td>The standard</td><td>Persistent AI characters use the "Generative Agents" memory: everything stored, ranked by recency, importance and relevance. Later systems add forgetting to save effort.</td><td>Intro, Related Work</td></tr>
+<tr><td>The gap</td><td>All of it aims to make agents remember <i>better</i>. They can forget to mention something but never misremember it. No one has checked an AI character's memory <i>errors</i> against human data, and no one separates a lie from an honest mistake.</td><td>Intro, Related Work</td></tr>
+<tr><td>The idea</td><td>A human-calibrated memory model decides; the language model only speaks; secrets never reach it.</td><td>System</td></tr>
+<tr><td>The tests</td><td>Is the memory human-like? (Study 1) Do the words follow the decision? (Study 2) Does a suggestion stick? (Study 3) Do social and habit effects appear? (Study 4) Does identity hold? (Study 5)</td><td>Studies 1–5</td></tr>
+<tr><td>The findings</td><td>Deciding outside the model keeps secrets and makes error rates belong to the character, not the model.</td><td>Discussion</td></tr>
+<tr><td>The limits</td><td>No player study yet; small language models; one story; one mechanism that failed.</td><td>Discussion</td></tr>
+</table></div>
+
+<h2 id="terms">3. Terms you need</h2>
+<dl>
+<dt>Episodic vs. identity (core) memory</dt>
+<dd>Episodic: something that happened ("I heard a thud at eleven"). Identity: who the character is ("my husband was killed in 1917"). In our design episodic memories fade; identity memories never do.</dd>
+<dt>Detail vs. gist</dt>
+<dd>People lose exact details before the general idea. Each memory can be recalled in detail, only as gist, or not at all.</dd>
+<dt>Source monitoring / source tag</dt>
+<dd>Knowing <i>where</i> a memory came from: did I see it, or was I told it? We store a "who told me" tag that fades faster than the memory itself. When the tag is gone, a told detail feels like something you saw.</dd>
+<dt>Misinformation effect</dt>
+<dd>Information given after an event (for example in a leading question) changes what people later report about the event (Loftus).</dd>
+<dt>DRM false recognition</dt>
+<dd>A classic test: people study word lists like <i>bed, rest, tired, dream</i> and later "recognise" <i>sleep</i>, which was never on the list.</dd>
+<dt>Memory conformity / social contagion</dt>
+<dd>People who discuss an event start reporting details only the other person saw.</dd>
+<dt>Schema intrusion</dt>
+<dd>A habit fills a gap: the housekeeper "remembers" carrying the tea up last night because she does it every night, even though last night she didn't.</dd>
+<dt>Baselines B1 and B2</dt>
+<dd>B1 is perfect memory (the Generative Agents style: nothing fades, sources kept). B2 is simple exponential forgetting (the MemoryBank style). They are what existing systems do.</dd>
+<dt>Full / no checks / prompt only</dt>
+<dd>Three ways to produce an answer. Full: our engine decides, the model words it, the words are checked. No checks: the same without the check. Prompt only: the language model sees the memories (secrets too) and is told to act like a person with imperfect memory. Prompt only is the obvious alternative a game developer would try.</dd>
+<dt>Ablation</dt>
+<dd>Removing one part to see whether the result depends on it.</dd>
+<dt>Held-out probes</dt>
+<dd>Test questions written only for evaluation, never used while building or tuning the game. They stop us from grading ourselves on questions the system was tuned to answer.</dd>
+<dt>95% Wilson interval</dt>
+<dd>The error bars on every proportion. With 12–15 runs per point they are wide; we only draw conclusions from differences that are large or that hold for both language models.</dd>
+<dt>κ (kappa) and d</dt>
+<dd>d is how fast memories fade (fitted to Ebbinghaus's data: 0.130). κ is how much faster the source tag fades than the memory. κ is an assumption, so it is always shown as a range.</dd>
+</dl>
+
+<h2 id="system">4. The system (Figure 1)</h2>
+<p>Figure 1 in the paper is the pipeline for one question. Read it left to right, then along the bottom row.</p>
+<div class="flow">
+<div><b>1 Classify</b>About last night, about the person, about the conversation, or an accusation?</div>
+<div><b>2 Plant</b>Details the question takes for granted are stored as "the detective told me".</div>
+<div><b>3 Retrieve</b>The most recent, important and relevant memories of this character only.</div>
+<div><b>4 Fallible layer</b>Each memory: in detail, only the gist, or gone; source kept or lost.</div>
+<div><b>5 Decide</b>Truth, lie (cover story), honest false memory, or "I don't recall".</div>
+<div class="llm"><b>6 Voice</b>The language model words the decision. The only step that uses it.</div>
+<div><b>7 Check</b>Does the sentence match the decision? If not, retry once, then use a safe line.</div>
+<div><b>8 Write back</b>The question and answer become new memories; recalled ones get stronger.</div>
+</div>
+<div class="read"><b>How to explain it:</b> "Everything grey is ordinary code that follows rules and
+numbers. Only the orange box is the AI. The AI never decides whether the character lies or misremembers,
+and it never sees the character's secrets. That is the whole design idea."</div>
+<p><b>Example.</b> You ask Thomas, "Was it Mrs Hartwell you saw on the landing?" Step 2 stores "the person
+on the landing was Mrs Hartwell — told to me by the detective". A day later you ask "Who did you see?"
+Step 4 checks whether the "told by the detective" tag has faded (it fades fastest for Thomas, our most
+suggestible witness). If it has, step 5 runs a contest between his own vague memory and the suggestion;
+if the suggestion wins, the answer is an honest false memory, and the game knows it.</p>
+<p><b>The living house.</b> The interviews happen in a house where characters walk between rooms, gossip
+and act. It is still in development; the paper uses only its movement and gossip rules (Study 4) and
+says so.</p>
+
+<h2 id="setup">5. How the tests were kept fair (Table I)</h2>
+<p>A reviewer's first question is whether the setup could have produced the result by itself. Table I
+lists each possible bias and its control.</p>
+<div class="tablebox"><table>
+<tr><th>Possible bias</th><th>What we did</th></tr>
+<tr><td>The game world interfering (moods, gossip, a suspect getting killed mid-test)</td><td>Switched off during memory tests; Study 4 switches on only what it measures.</td></tr>
+<tr><td>Grading on the same questions the system was tuned on</td><td>New, held-out questions for scoring; development questions kept apart.</td></tr>
+<tr><td>A different model being picked silently</td><td>Each model pinned by name.</td></tr>
+<tr><td>Randomness lining up between runs</td><td>A new save for every run; every memory draw depends only on that save.</td></tr>
+<tr><td>A scorer that favours our design</td><td>The same fixed rules for every variant and model, written before the final runs; every answer is saved so anyone can re-score.</td></tr>
+</table></div>
+<p>Two checks of this: Study 1 was run twice and gave the same numbers to the last digit, and Study 4 is
+seeded and does the same.</p>
+
+<h2 id="s1">6. Study 1 — is the memory model human-like?</h2>
+<p><b>Question.</b> Before any AI is involved: does our memory model make the same kinds of mistakes as
+people, measured on four classic experiments?</p>
+
+<h3>Table II — the forgetting curve</h3>
+<figure><div class="plate"><img src="{{img:exp1a_forgetting.png}}" alt="Retention over time: Ebbinghaus's data with the fitted power-law curve, the exponential curve and the flat no-forgetting line."></div>
+<figcaption>Research figure for Table II: retention against delay, with each model's curve.</figcaption></figure>
+<p>We fitted each memory model to Ebbinghaus's famous data (how much he retained after 19 minutes up to
+31 days) and then predicted a modern repeat of his experiment <i>without refitting</i>.</p>
+<div class="tablebox"><table>
+<tr><th>Model</th><th>R² (fit)</th><th>RMSE (fit)</th><th>RMSE on the new data</th></tr>
+<tr><td>Ours (power law)</td><td class="num">.974</td><td class="num">.019</td><td class="num">.094</td></tr>
+<tr><td>B2 (exponential)</td><td class="num">.397</td><td class="num">.091</td><td class="num">.112</td></tr>
+<tr><td>B1 (no forgetting)</td><td class="num">–</td><td class="num">.659</td><td class="num">.743</td></tr>
+</table></div>
+<div class="read"><b>How to read it:</b> R² near 1 means the curve fits the data's shape; RMSE is the
+average error, lower is better. The "new data" column is the honest test, because the model never saw
+that data. Ours wins both. AICc (in the paper) also prefers ours after penalising its extra parameter.</div>
+
+<h3>Table III and Figure 2 — DRM false recognition</h3>
+<figure><div class="plate"><img src="{{img:exp1b_drm.png}}" alt="Bar chart: proportion called old for studied words, critical lures, unrelated words and lures of unstudied lists, for humans and each model."></div>
+<figcaption>Figure 2: the four groups of words, humans (black) against each model.</figcaption></figure>
+<div class="read"><b>How to read it:</b> The two right-hand groups are the "false memories": words
+never studied. Humans call the related lure "old" 72% of the time. Only our model produces any false
+recognition at all (59%); every baseline and the version without familiarity produce zero. These
+numbers were <i>predicted</i>, not fitted.</div>
+<div class="caveat"><b>Weak spot:</b> 59% is below the human 72%, and depends on how the word vectors
+are spread out. A fix decided after seeing the result (centring the vectors) gives 27%; the paper labels
+it post-hoc. Our false memories are all "feels familiar", never "I clearly remember", unlike people.</div>
+
+<h3>Misinformation and source monitoring</h3>
+<p>When misleading information arrives late in a long gap, people are fooled most. Ours: the chance of
+picking the true detail falls from .62 to .41 when misinformation arrives late in a week, against .51
+when it arrives early. B1 and B2 are never fooled. Of told details still remembered, the share
+remembered as <i>seen</i> rises from .71 after 20 minutes to .96 after a month.</p>
+<div class="ask"><b>If asked "so you just copied psychology formulas?":</b> "Yes, deliberately. The
+contribution is not a new formula; it is using them for the opposite goal to everyone else, testing
+them against human data in four experiments, and showing each error disappears when its part is
+removed."</div>
+
+<h2 id="s2">7. Study 2 — does the answer follow the decision?</h2>
+<p><b>Question.</b> The memory model decides; does the AI actually say what was decided? And does our
+design matter, compared with simply prompting the AI?</p>
+<p><b>How.</b> 13 held-out questions (lies, accusations, a habit, false premises, a word from after
+1926, a detail the witness never saw…), 12 fresh games per setting, 3 settings, 2 AI models: 156 answers
+per cell. Each answer is checked with a fixed rule, for example "a lie must stick to the cover story and
+must not contain any detail only the hidden truth has".</p>
+<figure><div class="plate"><img src="{{img:study2_fidelity.png}}" alt="Dot plot: share of answers following the decision, by probe group, for full, no checks and prompt only, for each model."></div>
+<figcaption>Figure 3: dots are the share of answers that follow the decision; lines are 95% intervals.</figcaption></figure>
+<div class="tablebox"><table>
+<tr><th>Model</th><th>Probes</th><th>Full</th><th>No checks</th><th>Prompt only</th></tr>
+<tr><td>qwen2.5:3b</td><td>all 13</td><td class="num">.79</td><td class="num">.79</td><td class="num">.68</td></tr>
+<tr><td></td><td>keeps the secret</td><td class="num">1.00</td><td class="num">1.00</td><td class="num">.67</td></tr>
+<tr><td>llama3.2:3b</td><td>all 13</td><td class="num">{{LL_full}}</td><td class="num">{{LL_nocheck}}</td><td class="num">{{LL_prompt}}</td></tr>
+<tr><td></td><td>keeps the secret</td><td class="num">{{LL_secfull}}</td><td class="num">{{LL_secnocheck}}</td><td class="num">{{LL_secprompt}}</td></tr>
+</table></div>
+<div class="read"><b>How to read it:</b> Compare the columns. "Full" vs "prompt only" asks whether
+deciding outside the AI matters. "Full" vs "no checks" asks whether checking the words matters.</div>
+<p><b>Finding 1: deciding outside the AI is what keeps secrets.</b> When the AI holds the secret and is
+asked to keep it, it gives it away in 10 of 36 answers (qwen) and 5 of 36 (Llama). Real examples: the killer, denying the murder, says "a crimson gown caught
+on a splintered corner of his desk as I left"; the nephew, asked for his alibi, says "I was down at the
+wine cellar, hiding some gambling debts". With our design the secret never reaches the AI, so it cannot
+leak.</p>
+<p><b>Finding 2: the word-check is a safety net, not the main mechanism.</b> Full and no-checks score the
+same overall (.79 and .79 with qwen, .80 and .83 with Llama). The check fired on fewer than 1 answer in 20. It matters for hard rules (never confess,
+never leak, nothing modern), not for average quality.</p>
+<div class="caveat"><b>Weak spots:</b> Two questions failed in every setting because the system
+classified them wrongly: "How long were you married to Lord Ravenswood?" was treated as a question about
+the night, so the doctor's widowhood wasn't used; "What colour was the dress?" was treated as personal,
+so she sometimes invented a colour. The scoring rule also missed two correct answers ("I have no family
+of my own"); we report the rule's count rather than quietly fixing it.</div>
+
+<h2 id="s3">8. Study 3 — does a suggestion become a memory?</h2>
+<p><b>Question.</b> If the detective suggests something, does the witness later remember it as their
+own, and does that depend on the character or on the AI model?</p>
+<p><b>How.</b> We plant a suggestion in two witnesses — Thomas (designed to be very suggestible, 0.9) and
+Agnes (less, 0.3) — and ask about it 1 hour, 1 day or 1 week later; 15 games per point; three settings
+(our layer, perfect memory B1, prompt only); two AI models.</p>
+<figure><div class="plate"><img src="{{img:study3_suggestion.png}}" alt="Four panels: share of answers claiming the suggestion as seen, by delay, for our layer, perfect memory and prompt only; Thomas and Agnes; two models."></div>
+<figcaption>Figure 4: columns are the two witnesses, rows are the two AI models; blue is our layer.</figcaption></figure>
+<div class="read"><b>How to read it:</b> Follow one colour across the two rows (models). Blue (our layer)
+sits in the same band, roughly 40–80%, for both models. Green (prompt only) jumps: for Thomas it is 0%
+with one model and almost 100% with the other. Orange (perfect memory) stays near 0 for Thomas but hits
+100% for Agnes with Llama.</div>
+<p><b>The key insight: with our layer, how often a witness is fooled belongs to the character; with
+prompting, it belongs to the AI model.</b> Prompting agreed with what the calibrated memory would have
+decided only 46% and 27% of the time. For a game designer, that is the difference between a character
+you can tune and one you cannot predict.</p>
+<p><b>A second insight:</b> even with perfect memory, Llama retold "the detective told me it was Thomas"
+as "it was Thomas" in every case. Small models turn hearsay into first-hand claims on their own, which is
+why the source decision must be made outside them.</p>
+<div class="caveat"><b>Weak spots:</b> The spoken answers compress the difference between Thomas and
+Agnes (the engine decided false memories more often for Thomas, as designed, but the voices adopt the
+suggestion for both). And adoption does not climb steadily over the week. That one is actually predicted
+by the memory model: the "told by" tag fades, but the memory itself fades too, so the chance of
+<i>recalling it and</i> believing you saw it stays flat or falls (Study 1 shows .39 → .20).</div>
+
+<h2 id="s4">9. Study 4 — gossip, pressure, habits</h2>
+<p><b>Question.</b> Do other human memory traits appear? This study needs no AI, so each number comes
+from 2000 simulated games and is exact for the model.</p>
+<h3>Figure 5 — memory conformity (gossip becomes "I saw it")</h3>
+<figure><div class="plate"><img src="{{img:study4_contagion.png}}" alt="Lines: share of hearers recalling a remark as seen rather than heard, over time, for four characters; the perfect-memory baseline is flat at zero."></div>
+<figcaption>Figure 5: of people who still remember something another character told them, the share who now remember it as something they saw.</figcaption></figure>
+<p>A remark Thomas makes at 9:30 reaches the whole household on foot in 13–27 minutes (just before
+lunch: within 21). A day later, the share who recall it as seen rather than heard is .68 for the doctor,
+.75 for the killer, .83 for the nephew, nearly 1.0 for the housekeeper: the order of their designed
+suggestibility. With perfect memory it is zero.</p>
+<h3>Interrogative pressure — a negative result</h3>
+<p>Fear was meant to make witnesses easier to mislead. It barely did: from .345 to .362 for the doctor,
+.467 to .498 for the nephew, no change for Thomas. The paper says this openly and explains why: we scaled
+the wrong part of the model.</p>
+<div class="ask"><b>If asked "why include something that failed?":</b> "Because hiding it would be
+dishonest, and it tells the next person where pressure should act. Reviewers trust a paper more when it
+reports what didn't work."</div>
+<h3>Schema intrusion</h3>
+<p>The housekeeper's routine replaces her faded memory of the one night it didn't happen in .55, .77 and
+.90 of games for low, medium and high forgetfulness: a dial a designer can turn.</p>
+
+<h2 id="s5">10. Study 5 — identity stays, episodes fade</h2>
+<p><b>Question.</b> Over a simulated week, does a character keep who they are while details of the night
+fade? We asked an identity question and a question about the night on days 0, 1, 3 and 7.</p>
+<figure><div class="plate"><img src="{{img:study5_selective.png}}" alt="Lines over days 0 to 7: identity answers (solid) and night answers (dotted) for Thomas and Dr. Vance, for two models."></div>
+<figcaption>Figure 6: solid lines are identity questions, dotted lines are questions about the night.</figcaption></figure>
+<div class="read"><b>How to read it:</b> Solid lines should stay at the top; dotted lines should drop,
+faster for the forgetful valet than for the reliable doctor.</div>
+<p>With qwen2.5 that is exactly what happens: identity answers correct in all 64 cases; Thomas's account
+of the night drops, the doctor's holds. With Llama, Thomas's account drops to 1 in 8 by day 7, but the
+doctor's identity also drifts: asked about her late husband, the model invented a violinist and a
+gardener even though her memory held the real facts.</p>
+<div class="read"><b>The point:</b> the <i>memory</i> keeps identity perfectly (by design); whether the
+<i>words</i> do depends on the AI model. That is a measurable failure of the voice, not of the memory,
+and it shows where a future check should go.</div>
+
+<h2 id="limits">11. Limits, and how to answer them</h2>
+<div class="tablebox"><table>
+<tr><th>Criticism</th><th>Answer</th></tr>
+<tr><td>"No players were tested."</td><td>True, and it is the main next step: a study comparing fallible and perfect memory with real players. The game already has the switch for it.</td></tr>
+<tr><td>"3B models are small."</td><td>On purpose: they run on a normal laptop, privately, which is how a game would ship. We used two different families so results aren't one model's quirk.</td></tr>
+<tr><td>"You wrote the scoring rules yourselves."</td><td>Yes, but fixed before the final runs, applied the same way to every setting, and every answer is published so others can re-score.</td></tr>
+<tr><td>"One story, five characters."</td><td>True. The mechanisms are general; testing a second case is future work.</td></tr>
+<tr><td>"The DRM number is below the human one."</td><td>Reported openly, with the cause (the word-vector geometry).</td></tr>
+<tr><td>"The game has bugs."</td><td>The paper measures the memory system, with the game world switched off during those tests, and says the house is still in development.</td></tr>
+</table></div>
+
+<h2 id="questions">12. Likely questions</h2>
+<div class="ask"><b>What is actually new?</b> Using human-memory mechanisms to make characters wrong
+<i>the way people are wrong</i>, checking those errors against human data, and showing that deciding them
+outside the AI keeps secrets and keeps error rates tied to the character.</div>
+<div class="ask"><b>Why not just use a bigger AI?</b> A bigger model would word things better, but it
+would still decide by itself whether to leak a secret or adopt a suggestion. The problem is who decides,
+not how fluent the speaker is.</div>
+<div class="ask"><b>Why does a game want worse memory?</b> Because the gameplay is telling an honest
+mistake from a lie. If witnesses are perfect, any contradiction is a lie. The physical evidence in the
+game always lets a careful player solve the case, so it stays fair.</div>
+<div class="ask"><b>How do you know the results are not luck?</b> Error bars on every number, a new game
+for every run, two AI models, held-out questions, and the no-AI studies are exact and reproduce to the
+last digit.</div>
+<div class="ask"><b>Is this ethical?</b> AI can implant false memories in real people. We do it to a
+fictional character and the game shows the player how their own questions changed the testimony, which
+is useful for teaching. Everything runs locally; no player data leaves the machine.</div>
+
+<h2 id="status">13. Where the paper stands</h2>
+<p>It is written as a full technical paper for the IEEE Conference on Games (8 pages plus references,
+IEEE format), with the reproducing scripts in <code>analysis/</code>. The strongest results are the
+secret-keeping one (Study 2) and the "error rate belongs to the model under prompting" one (Study 3). The
+biggest risk at review is the missing player study; many technical papers at this venue are accepted
+without one, but a small pilot would strengthen it. Before submitting: verify the references marked
+VERIFY, add authors, and state any AI assistance as the venue requires.</p>
+</div>

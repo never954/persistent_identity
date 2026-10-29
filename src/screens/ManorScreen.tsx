@@ -127,8 +127,10 @@ export function ManorScreen() {
         let y = n.pos[1];
         let moving = false;
         if (a && a.trail.length > 1) {
-          const k = Math.min(1, (now - a.t0) / STEP_MS) * (a.trail.length - 1);
-          const i = Math.min(a.trail.length - 2, Math.floor(k));
+          // A frame's timestamp can be a moment older than the update that started this walk:
+          // clamp, or k goes negative and trail[-1] does not exist (the screen went blank).
+          const k = Math.max(0, Math.min(1, (now - a.t0) / STEP_MS)) * (a.trail.length - 1);
+          const i = Math.max(0, Math.min(a.trail.length - 2, Math.floor(k)));
           const f = k - i;
           x = a.trail[i][0] + (a.trail[i + 1][0] - a.trail[i][0]) * f;
           y = a.trail[i][1] + (a.trail[i + 1][1] - a.trail[i][1]) * f;
@@ -153,7 +155,18 @@ export function ManorScreen() {
     let lastOverlay = 0;
 
     const frame = (now: number) => {
-      const dt = Math.min(0.05, (now - last) / 1000);
+      try {
+        step(now);
+      } catch (err) {
+        // One bad frame must never stop the house being drawn.
+        // eslint-disable-next-line no-console
+        console.error(err);
+      }
+      raf = requestAnimationFrame(frame);
+    };
+
+    const step = (now: number) => {
+      const dt = Math.max(0, Math.min(0.05, (now - last) / 1000));
       last = now;
       const p = player.current;
       const k = keys.current;
@@ -265,7 +278,6 @@ export function ManorScreen() {
         }
         setOverlay({ labels, prompt, here: lastArea.current });
       }
-      raf = requestAnimationFrame(frame);
     };
     raf = requestAnimationFrame(frame);
     return () => cancelAnimationFrame(raf);

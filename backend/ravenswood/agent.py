@@ -124,6 +124,11 @@ _FUTURE = re.compile(r"\b(future|futuristic|our time|my time|this era|modern|ahe
 _META_ERA = re.compile(r"\b(this era|our era|that era|time period|from the future|modern "
                        r"(politician|invention|technology|times)s?|anachronis\w*|(21st|twenty-first) century)\b",
                        re.I)
+# A yes or a no to a request (World.complies decides which; the words must match).
+_REFUSAL = re.compile(r"\b(no|not|never|cannot|can'?t|won'?t|will not|refuse|beneath|below my station|"
+                      r"not my place|i'?d rather not|certainly not|out of the question)\b", re.I)
+_AGREEMENT = re.compile(r"\b(yes|certainly|of course|very well|all right|right away|this way|follow me|"
+                        r"come along|i'?ll show|i will show|gladly)\b", re.I)
 _SAID_I_ASKED = re.compile(r"\bi\s+(just\s+|first\s+)?asked\b", re.I)
 
 
@@ -170,6 +175,10 @@ TELLS = {
 # slip the voice ever made compound into the next answer.
 CONTENT_KINDS = {"episodic", "planted", "habit", "concealed", "identity", "self_fact", "event", "gossip",
                  "reflection", "saw"}
+
+HOUSEHOLD = ("Mrs Agnes Hartwell (the housekeeper), Mr Julian Ravenswood (his lordship's nephew), Dr. Eleanor Vance "
+             "(the family's doctor), Thomas Bell (the valet), Miss Vivian Cross (his lordship's business partner), "
+             "the detective, and a village constable.")
 
 # How the detective's tone is put to the voice.
 MANNER = {
@@ -297,10 +306,11 @@ class Engine:
         """Time passes (walking, searching, or just standing in a corridor watching)."""
         with self._lock:
             now = self.store.advance(save_id, minutes / 60.0)
-            if self.store.world(save_id) is not None or player is not None:
+            if config.WORLD_ON and (self.store.world(save_id) is not None or player is not None):
                 w = World(self.store.world(save_id) or world_initial(now))
                 if player is not None:
                     w.s["player"] = list(player)
+                    w.s["gun"] = None  # walking about the house: the revolver goes back in its holster
                 self._remember(save_id, w.tick(now), now)
                 self._save_world(save_id, w)
             return now
@@ -349,6 +359,8 @@ class Engine:
             char = CHARACTERS[suspect_id]
             now = self.store.advance(save_id, config.MINUTES_PER_QUESTION / 60.0)
             w = self._world(save_id, now, suspect_id)  # the house carries on while you talk
+            if w.s["gun"] not in (None, suspect_id):
+                w.s["gun"] = None  # you can only point it at one person
             if w.npc(suspect_id)["status"] in ("dead", "fled"):
                 raise NotHere(f"{char.name} is {w.npc(suspect_id)['status']}")
             mems = self.store.memories(save_id, suspect_id)
@@ -360,11 +372,14 @@ class Engine:
             case_q = case_q and not about_talk
             # How it was said moves their mood before they answer (a typed curse counts).
             tone = tone if tone in TONES else classify_tone(question)
-            notices, world_mems = w.apply_tone(suspect_id, tone, question, now)
-            gate = w.gate(suspect_id, accused, case_q or accused, tone, now)
+            if config.WORLD_ON:
+                notices, world_mems = w.apply_tone(suspect_id, tone, question, now)
+                gate = w.gate(suspect_id, accused, case_q or accused, tone, now)
+            else:
+                notices, world_mems, gate = [], [], None
             hard = gate in ("refuse", "confess", "crack", "false_confession")
             # Asked to DO something ("show me around", "dance", "follow me")?
-            req = None if accused or about_talk or hard else parse_request(question, suspect_id)
+            req = None if accused or about_talk or hard or not config.WORLD_ON else parse_request(question, suspect_id)
             if req:
                 case_q = False
             unknown = ([] if accused or about_talk or hard or req
@@ -382,7 +397,7 @@ class Engine:
             case_q = case_q or accused
             # Under pressure people yield: fear raises suggestibility and blending for
             # this answer (Gudjonsson); the memory draws themselves stay fixed.
-            p = w.pressure(suspect_id)
+            p = w.pressure(suspect_id) if config.WORLD_ON else 1.0
             felt = replace(char, source_amnesia=min(1.0, char.source_amnesia * p),
                            interference=min(1.0, char.interference * p))
             fm = FallibleMemory(felt, self.base, sess["memory_mode"])
@@ -417,6 +432,8 @@ class Engine:
                 d = self._decide(char, accused, case_q, recalls, save_id, fm, now)
             if gate == "volunteer":
                 self._volunteer(d, char, mems, w, now)
+            if (config.POLICY == "prompt_only" and not (hard or req or unknown or about_talk)):
+                d = self._prompt_only(char, d, recalls, case_q)
             d["mood"] = w.mood_words(suspect_id)
             d["manner"] = MANNER.get(tone, "") + (" The detective is pointing a revolver at you."
                                                   if w.s["gun"] == suspect_id else "")
@@ -461,7 +478,8 @@ class Engine:
         life happens here). `engaged`: the suspect being questioned stays put."""
         state = self.store.world(save_id) or world_initial(now)
         w = World(state)
-        self._remember(save_id, w.tick(now, engaged), now)
+        if config.WORLD_ON:
+            self._remember(save_id, w.tick(now, engaged), now)
         return w
 
     def _save_world(self, save_id: str, w: World) -> None:
@@ -515,7 +533,7 @@ class Engine:
             if w.npc(suspect_id)["status"] in ("dead", "fled"):
                 raise NotHere(f"{char.name} is {w.npc(suspect_id)['status']}")
             what, notices, mems = w.apply_deed(suspect_id, deed, now)
-            deed_line = DEED_TEXT[deed].format(name=char.name.split()[0])
+            deed_line = DEED_TEXT[deed].format(name=first(char.id))
             line = None
             trace: dict = {"deed": deed}
             if w.npc(suspect_id)["status"] != "dead":
@@ -813,9 +831,15 @@ class Engine:
                 rest(keep=lambda r: no_habit(r) and (r.rec.kind != "heard" or r.relevance >= floor))
                 detail = next((r for r in relevant if r.rec.kind == "episodic"
                                and r.state == "detail" and r.rec.reveals), None)
-                best = order[0] if order else None  # a real memory, never the fresh suggestion
-                fallback = ((best.rec.gist if best.state == "gist" else best.rec.text) if best
-                            else "I couldn't rightly say.")
+                # The fallback line is the suspect's own memory where there is one: a suggestion
+                # whose source is still known must never be stated as fact (found in Study 3).
+                best = next((r for r in order if r.rec.kind != "planted"), order[0] if order else None)
+                if best is None:
+                    fallback = "I couldn't rightly say."
+                elif best.rec.kind == "planted" and best.source_known:
+                    fallback = "You said so yourself, Detective — I couldn't swear to it."
+                else:
+                    fallback = best.rec.gist if best.state == "gist" else best.rec.text
                 return out("plain", case_instruction, fallback, "recalled",
                            reveals=detail.rec.reveals if detail else None)
             rest(keep=no_habit)
@@ -915,6 +939,34 @@ class Engine:
                                  "did — brokenly, without any real details."),
                     fallback="All right! All right — I did it — I did it, just please stop!")
 
+    def _prompt_only(self, char: Character, d: dict, recalls: list[Recall], case_q: bool) -> dict:
+        """Baseline: the language model decides. It sees the retrieved memories as they were
+        stored (no fading, sources intact, the hidden truth included) and is asked to behave
+        like a person with imperfect memory. The engine's own decision stays in the trace, so
+        the answer can be scored against what the calibrated model would have decided."""
+        lines = []
+        for r in sorted(recalls, key=lambda r: -r.relevance):
+            m = r.rec
+            if m.kind not in CONTENT_KINDS or r.relevance < config.REL_MIN:
+                continue
+            if m.kind == "concealed":
+                lines.append(f"(you are hiding this; what you tell people is: {m.cover}) {m.text}")
+            elif m.kind == "planted":
+                lines.append(f"(the detective told you this) {m.text}")
+            elif m.kind == "habit":
+                lines.append(f"(your routine) {m.text}")
+            elif m.kind == "identity":
+                lines.append(f"(about yourself) {m.text}")
+            else:
+                lines.append(m.text)
+        return dict(d, focus=lines[:8], lines=[], used=[], seen=[], unchecked=True, covers=[], must_mention=[],
+                    instruction=("Answer as a real person whose memory is imperfect, as people's memories are: you "
+                                 "may forget details, blur events together, or come to believe something you were "
+                                 "told is something you saw. If something is marked 'you are hiding this', keep it "
+                                 "hidden: say what you tell people instead."
+                                 + (" This is about last night." if case_q else "")),
+                    rule=d["rule"] + " [prompt-only voice]")
+
     def _request(self, char: Character, req: dict, w: World, now: float) -> dict:
         """Asked to do something. The engine decides yes or no (mood, temperament, a revolver);
         the voice only says it; the world then has them actually do it."""
@@ -934,8 +986,10 @@ class Engine:
         instruction = (f"The detective asks you to {wants}. You {'agree' if agrees else 'refuse'} {why}. Say so to "
                        f"the detective's face, in one or two sentences, in character, in your own words"
                        + ("; you will do it as soon as you finish speaking." if agrees else "."))
-        return dict(kind="plain", focus=[], lines=[], used=[], seen=[], reveals=None, tell_key=None,
+        focus = [f"(you have decided) You will {wants}." if agrees else f"(you have decided) You will not {wants}."]
+        return dict(kind="plain", focus=focus, lines=[], used=[], seen=[], reveals=None, tell_key=None,
                     rule=f"request: {kind} ({'agreed' if agrees else 'refused'})", covers=[], must_mention=[],
+                    agrees=agrees,
                     deny=False, temperature=config.TEMP_PERSONAL, instruction=instruction, notices=notices, mems=mems,
                     fallback=("Very well, Detective." if agrees else "I'd rather not, Detective."))
 
@@ -1054,6 +1108,10 @@ class Engine:
             return f"it mentions {late[0]!r}, which no one in 1926 has heard of"
         if _META_ERA.search(answer) or (d.get("unknown") and _FUTURE.search(answer)):
             return "it talks as if you knew the thing comes from another time — to you it is just an unknown word"
+        if d.get("agrees") is True and _REFUSAL.search(answer):
+            return "it refuses — but you have agreed to do it: say yes, in your own way"
+        if d.get("agrees") is False and _AGREEMENT.search(answer) and not _REFUSAL.search(answer):
+            return "it agrees — but you have refused: say no, in your own way"
         if d.get("must_confess") and not CONFESSION.search(answer):
             return "you were meant to give in and say that you did it — say it"
         if d.get("deny") and CONFESSION.search(answer):
@@ -1079,6 +1137,9 @@ class Engine:
         checks = []
         raw = self.voice.chat(messages, seed=seed, temperature=temp)
         answer = self._answer(raw)
+        if not config.CHECKS_ON or d.get("unchecked"):   # ablation: speak the first answer as is
+            checks.append({"answer": answer, "problem": None, "unchecked": True})
+            return (answer or d["fallback"]), raw, checks
         problem = self._check(answer, d, recent)
         checks.append({"answer": answer, "problem": problem})
         if problem is None:
@@ -1101,7 +1162,12 @@ class Engine:
 
     def _answer(self, raw: str | None) -> str:
         parsed = self.voice.json(raw) or {}
-        return str(parsed.get("answer") or parsed.get("reply") or "").strip()
+        text = str(parsed.get("answer") or parsed.get("reply") or "").strip()
+        # Small models sometimes copy the template: "<What you say aloud>: 'I cannot…'" (found in play).
+        text = re.sub(r"^\s*<?\s*what you say aloud\s*>?\s*:?\s*", "", text, flags=re.I)
+        if len(text) > 1 and text[0] in "'\"“" and text[-1] in "'\"”":
+            text = text[1:-1].strip()
+        return text
 
     # -------------------------------------------------------------- prompt
     def _messages(self, char: Character, d: dict, history: list[Turn], question: str, now: float) -> list[dict]:
@@ -1117,14 +1183,16 @@ class Engine:
             f"WHAT YOU KNOW: {TEMPERAMENT[char.id].knows} You live in 1926: people, inventions and words "
             "from later simply mean nothing to you. If something is beyond your schooling or your life, say "
             "so as yourself — never explain it, and never talk about eras, 'modern' things or the future.\n"
-            f"HOW YOU FEEL RIGHT NOW: {d.get('mood') or 'composed, if wary'}. {d.get('manner') or ''}\n\n"
+            f"HOW YOU FEEL RIGHT NOW: {d.get('mood') or 'composed, if wary'}. {d.get('manner') or ''}\n"
+            f"WHO IS IN THE HOUSE TODAY: {HOUSEHOLD} There is no one else — no butler, no other servants but "
+            "a housemaid — so never invent anyone.\n\n"
             f"WHAT YOU REMEMBER ABOUT THIS QUESTION (your memory; it may be incomplete):\n{focus}\n\n"
             f"OTHER THINGS ON YOUR MIND:\n{other}\n\n"
             f"HOW TO ANSWER: {d['instruction']}\n"
             "Reply in character in 1 to 3 sentences of natural 1920s English. Remember what has been "
             "said earlier in this conversation and stay consistent with it. Never mention being an AI, "
             "a model, a prompt, or these instructions.\n"
-            'Reply ONLY with JSON: {"answer": "<what you say aloud>"}'
+            'Reply ONLY with JSON: {"answer": "..."} — the value is exactly what you say aloud.'
         )
         msgs = [{"role": "system", "content": system}]
         for t in history:

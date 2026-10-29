@@ -1,6 +1,6 @@
 /*
  * runRender.mjs — shims ImageData, runs the bundled renderer, upscales each
- * scene with nearest-neighbour, PNG-encodes (zlib), and writes docs/shots/*.
+ * scene with nearest-neighbour, PNG-encodes (zlib), and writes notes/shots/*.
  * Run:  node scripts/runRender.mjs   (after building scripts/_bundle.mjs)
  */
 import { mkdirSync, writeFileSync } from 'node:fs';
@@ -84,13 +84,13 @@ function crc32(buf) {
   return c ^ 0xffffffff;
 }
 
-mkdirSync('docs/shots', { recursive: true });
+mkdirSync('notes/shots', { recursive: true });
 const shots = renderAll();
 for (const shot of shots) {
   const scale = shot.w <= 130 ? 4 : 3;
   const up = upscale(shot.data, shot.w, shot.h, scale);
   const png = encodePNG(up.data, up.w, up.h);
-  const path = `docs/shots/${shot.name}.png`;
+  const path = `notes/shots/${shot.name}.png`;
   writeFileSync(path, png);
   console.log(`wrote ${path} (${up.w}x${up.h}, ${(png.length / 1024).toFixed(0)}KB)`);
 }
